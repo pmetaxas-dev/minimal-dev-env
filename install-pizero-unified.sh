@@ -34,6 +34,7 @@ echo "Detected Architecture: $ARCH"
 
 INSTALL_CODE_SERVER=true
 INSTALL_AI=true
+INSTALL_FALKON=true
 
 for arg in "$@"; do
   case $arg in
@@ -43,11 +44,15 @@ for arg in "$@"; do
     --no-ai)
       INSTALL_AI=false
       ;;
+    --no-falkon)
+      INSTALL_FALKON=false
+      ;;
     *)
       echo "Unknown option: $arg"
       echo "Available options:"
       echo "  --no-code-server"
       echo "  --no-ai"
+      echo "  --no-falkon"
       exit 1
       ;;
   esac
@@ -92,22 +97,44 @@ sudo apt upgrade -y
 echo "==> Installing core tools"
 sudo apt install -y \
   build-essential git curl wget python3 python3-pip \
-  tmux neovim ripgrep fzf htop ncdu jq ranger eza \
+  tmux neovim ripgrep fzf htop ncdu jq ranger \
   ca-certificates unzip fd-find lua5.4 w3m w3m-img
+
+############################################
+# Install eza (via cargo)
+############################################
+
+echo "==> Installing eza (modern ls replacement)"
+if ! command -v cargo >/dev/null 2>&1; then
+  echo "Installing Rust first (cargo required for eza)"
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  source "$HOME/.cargo/env"
+fi
+
+cargo install eza
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 
 ############################################
 # Install languages
 ############################################
-
-echo "==> Installing Rust"
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-source "$HOME/.cargo/env"
 
 echo "==> Installing Go"
 sudo apt install -y golang
 
 echo "==> Installing Node.js (Debian version)"
 sudo apt install -y nodejs npm
+
+############################################
+# Falkon lightweight browser (optional)
+############################################
+
+if [ "$INSTALL_FALKON" = true ]; then
+  echo "==> Installing Falkon (lightweight GUI browser)"
+  sudo apt install -y falkon || echo "⚠️ Falkon not available on this OS"
+else
+  echo "⚠️ Skipping Falkon (--no-falkon)"
+fi
 
 ############################################
 # Code-Server (optional)
@@ -253,5 +280,8 @@ echo "Neovim AI: :ChatGPT"
 echo "Terminal AI: ai \"your question\""
 if [ "$INSTALL_CODE_SERVER" = true ]; then
   echo "Code-Server: systemctl --user start code-server"
+fi
+if [ "$INSTALL_FALKON" = true ]; then
+  echo "Falkon installed: run 'falkon' to open the browser"
 fi
 echo
