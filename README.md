@@ -104,11 +104,12 @@ Skip everything optional:
 
 ## 🤖 AI Usage
 
-### 1. Set your OpenAI API key
+### Set your OpenAI API key (bash)
 
 ```bash
 export OPENAI_API_KEY="your_api_key_here"
-echo 'export OPENAI_API_KEY="your_api_key_here"' >> ~/.zshrc
+echo 'export OPENAI_API_KEY="your_api_key_here"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ### 2. Use the global `ai` command
