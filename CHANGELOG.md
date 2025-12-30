@@ -1,22 +1,30 @@
 # CHANGELOG
 
-## [2.2.0] – 2025‑12‑30
+## [2.3.0] – 2025‑12‑30
 ### Added
-- **XFCE minimal desktop** to `install-desktop-universal.sh`
-- **Openbox ultra‑minimal GUI** to `install-pizero-unified.sh`
-- GUI is **disabled by default** using `systemctl set-default multi-user.target`
-- Manual GUI launch instructions (`startx`)
-- Updated README with:
-  - GUI section
-  - Browser compatibility notes
-  - Updated flags table
-  - Updated installation examples
+- Renamed `install-pizero-unified.sh` → **install-pi-zero.sh**
+- Added **USB-based .env import script** (`import-env-from-usb.sh`)
+- Added `.env.example` template
+- Added `.env` to `.gitignore`
+- Added `.env` auto-loading in both installers
+- Added secure `.env` creation with permissions
+- Updated Neovim ChatGPT.nvim to load API key from `.env`
+- Updated `ai` CLI to load `.env` directly
+- Added full documentation for `.env` usage and USB import
+- Added XFCE minimal desktop to desktop installer
+- Added Openbox ultra-minimal GUI to Pi Zero installer
 
 ### Changed
 - Browser support:
   - Desktop → Chromium
   - Pi Zero → Falkon
-- README reorganized for clarity and GUI integration
+- GUI is now disabled by default (`multi-user.target`)
+- README updated with:
+  - GUI section
+  - USB import instructions
+  - `.env` workflow
+  - Updated flags table
+  - Updated installation examples
 - Improved installer descriptions and feature lists
 
 ### Fixed
@@ -25,11 +33,17 @@
 
 ---
 
+## [2.2.0]
+- Added GUI support (XFCE/Openbox)
+- Added manual `startx` instructions
+- Updated README and flags
+
+---
+
 ## [2.1.0]
 - Added Chromium browser to desktop installer
 - Added Falkon browser to Pi installer
 - Added `--no-chromium` and `--no-falkon` flags
-- Updated README and flags table
 
 ---
 
