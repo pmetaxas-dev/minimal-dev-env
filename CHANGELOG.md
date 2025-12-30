@@ -1,48 +1,43 @@
 # CHANGELOG
 
-## [1.4.0] – 2025-12-30
+## [1.5.0] – 2025‑12‑30
 ### Added
-- Full AI integration using the OpenAI API
-- Global `ai` command for terminal-based AI queries
-- Neovim AI plugin: ChatGPT.nvim
-- New installer flags:
-  - `--no-ai`
-  - `--no-docker`
-  - `--no-code-server`
-- Unified Pi Zero 2 W installer with:
-  - Neovim IDE (Treesitter, LSP, Telescope, cmp, Git signs, Lualine)
-  - Optional Code‑Server
-  - Optional Docker
-  - Rust, Go, Node.js, Python3
-  - Zsh environment
-- Updated README to document AI usage and installer flags
+- New **Minimal Pi Zero Installer** (`install-pizero-minimal.sh`)
+- Optional AI integration (ChatGPT.nvim + `ai` CLI)
+- Optional Code‑Server installation
+- Minimal Neovim configuration:
+  - Telescope
+  - Git signs
+  - Lualine
+  - No Treesitter
+  - No LSP
+  - No autocomplete
 
 ### Changed
-- Consolidated all Pi Zero setup steps into a single unified installer
-- Improved validation logic and error messages
-- Simplified Neovim configuration structure
-- Removed Zsh entirely from the installer
-- Bash is now the default and only supported shell
-- AI environment variables now persist in ~/.bashrc
-- Removed shell switching (no more chsh)
-
-### Fixed
-- fd/fdfind aliasing on Debian-based systems
-- Missing dependencies for ChatGPT.nvim (plenary, nui)
+- Replaced `exa` with `eza` for compatibility with Raspberry Pi OS
+- Switched Node.js installation to Debian repo version for ARMv7 stability
+- Bash‑only environment (no Zsh)
+- Updated README to reflect minimal edition
+- Updated unified installer references
 
 ### Removed
-- Docker support removed entirely from the Pi Zero unified installer
-- `--no-docker` flag removed
-- All Docker-related messages and group modifications removed
-
+- Treesitter (removed for performance reasons)
+- All LSP servers (clangd, pyright, lua_ls, rust-analyzer)
+- Autocomplete (nvim-cmp, LuaSnip)
+- Docker support (fully removed)
+- Zsh installation and shell switching
 
 ---
 
-## [1.3.0] – Previous Release
-- Added Pi Zero optimized installer
-- Added minimal Neovim config
+## [1.4.0]
+- Added full Pi Zero unified installer
+- Added AI integration
+- Added ChatGPT.nvim
 - Added Code‑Server support
-- Added Docker support
+
+## [1.3.0]
+- Added Pi Zero optimized installer
+- Added Neovim IDE
 
 ## [1.2.0]
 - Added validation script
