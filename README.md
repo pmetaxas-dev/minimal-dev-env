@@ -66,13 +66,13 @@ chmod +x install-pizero-unified.sh
 
 ## ⚙️ Installer Options
 
-The installer supports optional flags:
-
 | Flag | Description |
 |------|-------------|
-| `--no-docker` | Skip Docker installation |
 | `--no-code-server` | Skip Code‑Server installation |
 | `--no-ai` | Skip AI integration (OpenAI, ChatGPT.nvim, `ai` command) |
+
+### Note  
+Docker has been **fully removed** from the Pi Zero installer because it is too heavy for the device and causes memory pressure.
 
 ### Examples
 
