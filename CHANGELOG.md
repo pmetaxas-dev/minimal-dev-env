@@ -21,6 +21,10 @@
 - Consolidated all Pi Zero setup steps into a single unified installer
 - Improved validation logic and error messages
 - Simplified Neovim configuration structure
+- Removed Zsh entirely from the installer
+- Bash is now the default and only supported shell
+- AI environment variables now persist in ~/.bashrc
+- Removed shell switching (no more chsh)
 
 ### Fixed
 - fd/fdfind aliasing on Debian-based systems
