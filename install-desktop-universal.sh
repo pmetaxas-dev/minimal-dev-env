@@ -421,7 +421,7 @@ fi
 
 if [ "$INSTALL_AI" = true ]; then
   echo "==> Installing OpenAI CLI"
-  pip install --upgrade "openai>=1.0.0"
+  pip install --break-system-packages --upgrade "openai>=1.0.0"
 
   sudo tee /usr/local/bin/ai >/dev/null << 'EOF'
 #!/usr/bin/env bash
@@ -518,3 +518,4 @@ if [ "$INSTALL_DOCKER" = true ]; then
   echo "Docker: log out and back in to use 'docker' without sudo."
 fi
 echo
+
