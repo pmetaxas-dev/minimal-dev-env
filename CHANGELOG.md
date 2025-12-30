@@ -30,6 +30,12 @@
 - fd/fdfind aliasing on Debian-based systems
 - Missing dependencies for ChatGPT.nvim (plenary, nui)
 
+### Removed
+- Docker support removed entirely from the Pi Zero unified installer
+- `--no-docker` flag removed
+- All Docker-related messages and group modifications removed
+
+
 ---
 
 ## [1.3.0] – Previous Release
