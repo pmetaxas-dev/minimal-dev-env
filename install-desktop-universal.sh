@@ -11,6 +11,7 @@ INSTALL_DOCKER=true
 INSTALL_ZSH=true
 INSTALL_CODE_SERVER=true
 INSTALL_AI=true
+INSTALL_CHROMIUM=true
 NVIM_MODE="full"  # "full" or "minimal"
 
 for arg in "$@"; do
@@ -19,6 +20,7 @@ for arg in "$@"; do
     --no-zsh) INSTALL_ZSH=false ;;
     --no-code-server) INSTALL_CODE_SERVER=false ;;
     --no-ai) INSTALL_AI=false ;;
+    --no-chromium) INSTALL_CHROMIUM=false ;;
     --minimal-nvim) NVIM_MODE="minimal" ;;
     *)
       echo "Unknown option: $arg"
@@ -27,6 +29,7 @@ for arg in "$@"; do
       echo "  --no-zsh"
       echo "  --no-code-server"
       echo "  --no-ai"
+      echo "  --no-chromium"
       echo "  --minimal-nvim"
       exit 1
       ;;
@@ -111,15 +114,37 @@ sudo apt install -y \
   manpages-dev \
   jq \
   ranger \
-  eza \
   ca-certificates \
   unzip \
   fd-find \
   w3m \
   w3m-img
 
+#######################################
+# eza (via cargo)
+#######################################
+
+echo "==> Installing eza (modern ls replacement)"
+if ! command -v cargo >/dev/null 2>&1; then
+  echo "Installing Rust first (cargo required for eza)"
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  source "$HOME/.cargo/env"
+fi
+
+cargo install eza
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+#######################################
+# Static analysis tools
+#######################################
+
 echo "==> Installing static analysis tools"
 sudo apt install -y cppcheck clang-tidy clang-format
+
+#######################################
+# Networking tools
+#######################################
 
 echo "==> Installing networking tools"
 sudo apt install -y iproute2 iputils-ping traceroute nmap tcpdump
@@ -132,9 +157,9 @@ if [ "$INSTALL_DOCKER" = true ]; then
   echo "==> Installing Docker"
   sudo apt install -y docker.io docker-compose-plugin
   sudo usermod -aG docker "$USER"
-  echo "⚠️  Docker group updated. Log out and back in to use Docker without sudo."
+  echo "⚠️ Docker group updated. Log out and back in to use Docker without sudo."
 else
-  echo "⚠️  Skipping Docker (--no-docker)"
+  echo "⚠️ Skipping Docker (--no-docker)"
 fi
 
 #######################################
@@ -157,7 +182,6 @@ sudo apt install -y gh
 
 echo "==> Installing Rust (rustup)"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-# shellcheck disable=SC1090
 source "$HOME/.cargo/env"
 
 echo "==> Installing Go"
@@ -167,14 +191,25 @@ echo "==> Installing Node.js (Debian/Ubuntu version) + npm"
 sudo apt install -y nodejs npm
 
 #######################################
-# Code-Server (optional, headless VS Code)
+# Chromium Browser (optional)
+#######################################
+
+if [ "$INSTALL_CHROMIUM" = true ]; then
+  echo "==> Installing Chromium browser"
+  sudo apt install -y chromium-browser || sudo apt install -y chromium
+else
+  echo "⚠️ Skipping Chromium (--no-chromium)"
+fi
+
+#######################################
+# Code-Server (optional)
 #######################################
 
 if [ "$INSTALL_CODE_SERVER" = true ]; then
   echo "==> Installing Code-Server"
   curl -fsSL https://code-server.dev/install.sh | sh
 else
-  echo "⚠️  Skipping Code-Server (--no-code-server)"
+  echo "⚠️ Skipping Code-Server (--no-code-server)"
 fi
 
 #######################################
@@ -414,7 +449,7 @@ EOF
 
   sudo chmod +x /usr/local/bin/ai
 else
-  echo "⚠️  Skipping AI (--no-ai)"
+  echo "⚠️ Skipping AI (--no-ai)"
 fi
 
 #######################################
@@ -438,10 +473,10 @@ SAVEHIST=50000
 setopt hist_ignore_all_dups
 EOF
 
-  echo "⚠️  Zsh installed. If you want to use it as your default shell, run:"
+  echo "⚠️ Zsh installed. If you want to use it as your default shell, run:"
   echo "    chsh -s /usr/bin/zsh"
 else
-  echo "⚠️  Skipping Zsh (--no-zsh)"
+  echo "⚠️ Skipping Zsh (--no-zsh)"
 fi
 
 #######################################
@@ -475,6 +510,9 @@ fi
 if [ "$INSTALL_CODE_SERVER" = true ]; then
   echo "Code-Server: systemctl --user start code-server"
   echo "Then open: http://<your-server-ip>:8080"
+fi
+if [ "$INSTALL_CHROMIUM" = true ]; then
+  echo "Chromium installed: run 'chromium' or 'chromium-browser'"
 fi
 if [ "$INSTALL_DOCKER" = true ]; then
   echo "Docker: log out and back in to use 'docker' without sudo."
