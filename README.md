@@ -1,10 +1,11 @@
 # 🧰 Universal Dev Environment Installers  
-### For Desktop/Server and Raspberry Pi Zero 2 W (Headless‑First, GUI‑Optional)
+### For Desktop/Server and Raspberry Pi Zero 2 W  
+### (Headless‑First, GUI‑Optional, AI‑Ready)
 
 This repository provides two fully‑featured, headless‑friendly development environment installers:
 
 - **install-desktop-universal.sh** — for Ubuntu Server, Debian, and headless desktop PCs  
-- **install-pizero-unified.sh** — for Raspberry Pi Zero 2 W running Raspberry Pi OS Legacy (64‑bit)
+- **install-pi-zero.sh** — for Raspberry Pi Zero 2 W running Raspberry Pi OS Legacy (64‑bit)
 
 Both installers are:
 
@@ -14,7 +15,9 @@ Both installers are:
 - 🌐 Browser‑ready (Chromium or Falkon)  
 - 🤖 AI‑enabled (optional)  
 - ✨ Neovim‑based IDE (minimal or full)  
-- 🖥 Code‑Server‑enabled (optional)
+- 🖥 Code‑Server‑enabled (optional)  
+- 🔑 `.env`‑based API key loading  
+- 📦 USB import support for `.env`
 
 ---
 
@@ -49,23 +52,23 @@ bash install-desktop-universal.sh --no-docker --no-zsh --no-code-server --no-ai 
 
 ---
 
-# 🍓 Raspberry Pi Zero 2 W Installation (Raspberry Pi OS Legacy 64‑bit)
+# 🍓 Raspberry Pi Zero 2 W Installation
 
 ```bash
-bash install-pizero-unified.sh
+bash install-pi-zero.sh
 ```
 
 Minimal install example:
 
 ```bash
-bash install-pizero-unified.sh --no-code-server --no-ai --no-falkon
+bash install-pi-zero.sh --no-code-server --no-ai --no-falkon
 ```
 
 ---
 
 # 🧭 GUI Support (Optional)
 
-Both installers now include **lightweight graphical environments**, but **they do NOT start automatically**.  
+Both installers include **lightweight graphical environments**, but **they do NOT start automatically**.  
 Your system will still boot into **pure terminal mode**.
 
 ### 🖥 Desktop Installer → XFCE Minimal
@@ -94,6 +97,49 @@ sudo systemctl set-default multi-user.target
 ```
 
 This ensures **CLI‑only boot**, even with GUI installed.
+
+---
+
+# 🔑 API Key Management via `.env`
+
+Your OpenAI API key is stored in:
+
+```
+~/.env
+```
+
+Example:
+
+```
+OPENAI_API_KEY="sk-xxxx..."
+```
+
+The installers automatically:
+
+- Create `.env` if missing  
+- Add `source ~/.env` to `.bashrc`  
+- Configure the `ai` CLI to load `.env`  
+- Configure Neovim ChatGPT.nvim to read `.env`  
+
+---
+
+# 📦 Importing `.env` from USB
+
+Use the included script:
+
+```bash
+bash import-env-from-usb.sh
+```
+
+It will:
+
+- Detect the USB device  
+- Mount it  
+- Copy `.env` to your home directory  
+- Set secure permissions  
+- Unmount safely  
+
+Perfect for offline systems.
 
 ---
 
@@ -159,11 +205,9 @@ Inside Neovim:
 :ChatGPT
 ```
 
-### Set your API key
-```bash
-export OPENAI_API_KEY="your_api_key_here"
-echo 'export OPENAI_API_KEY="your_api_key_here"' >> ~/.bashrc
-source ~/.bashrc
+### API key is loaded automatically from:
+```
+~/.env
 ```
 
 ---
@@ -224,8 +268,10 @@ This checks:
 minimal-dev-env/
 │
 ├── install-desktop-universal.sh     # Desktop/server installer
-├── install-pizero-unified.sh        # Pi Zero unified installer
+├── install-pi-zero.sh               # Pi Zero installer
+├── import-env-from-usb.sh           # USB-based .env importer
 ├── validate.sh                      # System validation script
+├── .env.example                     # Template for API key
 ├── README.md
 ├── CHANGELOG.md
 └── LICENSE
