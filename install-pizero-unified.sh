@@ -303,3 +303,5 @@ if [ "$INSTALL_FALKON" = true ]; then
   echo "Falkon installed: run 'falkon' to open the browser"
 fi
 echo
+
+echo "USB import script available: ./import-env-from-usb.sh"
