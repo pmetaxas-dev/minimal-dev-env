@@ -307,22 +307,23 @@ else
 fi
 
 #######################################
-# Zsh
+# Shell Environment (Bash Only)
 #######################################
 
-echo "==> Installing Zsh"
-sudo apt install -y zsh
-chsh -s /usr/bin/zsh
+echo "==> Configuring Bash environment"
 
-cat << 'EOF' > ~/.zshrc
-export EDITOR=nvim
-export VISUAL=nvim
-export OPENAI_API_KEY="$OPENAI_API_KEY"
+# Ensure OPENAI_API_KEY persists in bash
+if [ "$INSTALL_AI" = true ]; then
+  if ! grep -q "OPENAI_API_KEY" ~/.bashrc; then
+    echo 'export OPENAI_API_KEY="$OPENAI_API_KEY"' >> ~/.bashrc
+  fi
+fi
 
-HISTSIZE=50000
-SAVEHIST=50000
-setopt hist_ignore_all_dups
-EOF
+# Set Neovim as default editor
+if ! grep -q "EDITOR=nvim" ~/.bashrc; then
+  echo 'export EDITOR=nvim' >> ~/.bashrc
+  echo 'export VISUAL=nvim' >> ~/.bashrc
+fi
 
 #######################################
 # Done
