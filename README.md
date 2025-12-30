@@ -1,106 +1,97 @@
-# Universal Minimal Dev Environment Installer  
-### (Ubuntu Server • Debian • Raspberry Pi OS • Pi Zero 2 W Optimized)
+# 🧰 Universal Dev Environment Installers  
+### For Desktop/Server and Raspberry Pi Zero 2 W (Headless, Bash‑Only)
 
-This project provides a **universal**, **auto‑detecting**, **minimal** development environment installer that works across:
+This repository provides two fully‑featured, headless‑friendly development environment installers:
 
-- **Ubuntu Server (headless)**
-- **Debian**
-- **Raspberry Pi OS (Legacy, 64‑bit)**
-- **Raspberry Pi Zero 2 W**
-- **ARMv7 / ARM64 / x86_64**
+- **install-desktop-universal.sh** — for Ubuntu Server, Debian, and headless desktop PCs  
+- **install-pizero-unified.sh** — for Raspberry Pi Zero 2 W running Raspberry Pi OS Legacy (64‑bit)
 
-The installer automatically detects your OS and architecture and configures a **lightweight, stable, bash‑only development environment**.
+Both installers are:
+
+- Bash‑only (no Zsh or GUI dependencies)
+- Headless‑compatible
+- AI‑enabled (optional)
+- Code‑Server‑enabled (optional)
+- Neovim‑based IDE (minimal or full)
+
+---
+
+## 📦 Installers Overview
+
+### 🖥 Desktop/Server Installer  
+**File:** `install-desktop-universal.sh`  
+**Best for:**  
+- Ubuntu Server  
+- Debian  
+- Headless desktops  
+- Cloud VMs  
+
+### 🍓 Pi Zero Installer  
+**File:** `install-pizero-unified.sh`  
+**Best for:**  
+- Raspberry Pi Zero 2 W  
+- Raspberry Pi OS Legacy (64‑bit)  
+- ARMv7 systems  
 
 ---
 
 ## 🚀 Features
 
-### 🧱 Core Development Tools
+### Core Tools
 - GCC, Make, CMake  
-- Git  
+- Git, curl, wget  
 - Python3 + pip  
-- Go  
-- Rust (rustup)  
-- Node.js (Debian version for ARM stability)  
+- Go, Rust, Node.js (Debian version)  
 - ripgrep, fzf, fd, ranger, eza  
-- tmux  
-- jq  
+- tmux, jq, ncdu, htop  
 - w3m terminal browser  
+- Static analysis tools (clang-tidy, cppcheck)  
+- Networking tools (nmap, tcpdump, traceroute)
 
-### 🧑‍💻 Minimal Neovim IDE
-- Telescope (fuzzy finder)  
-- Git signs  
-- Lualine  
-- **No Treesitter**  
-- **No LSP**  
-- **No autocomplete**  
-- Fast startup, low memory usage  
-- Perfect for Pi Zero 2 W  
+### Neovim IDE
+- Minimal mode: Telescope, Git signs, Lualine  
+- Full mode: Treesitter, LSP servers, Autocomplete (cmp), ChatGPT.nvim  
+- Lazy.nvim plugin manager  
+- Bash‑based config
 
-### 🤖 AI Integration (Optional)
-- Global `ai` command (OpenAI API)  
+### AI Integration (Optional)
+- `ai` CLI using OpenAI API  
 - ChatGPT.nvim inside Neovim  
-- Uses GPT‑4o‑mini by default  
-- Bash‑only environment  
+- GPT‑4o‑mini by default  
+- Bash‑only, no GUI required
 
-### 🖥 Code‑Server (Optional)
-Run VS Code in your browser:
-
-```
-http://<device-ip>:8080
-```
+### Code‑Server (Optional)
+- Browser‑based VS Code  
+- Runs on port `8080`  
+- Systemd user service
 
 ---
 
-## 📦 Installation
-
-Clone the repo:
-
-```bash
-git clone https://github.com/<your-username>/minimal-dev-env.git
-cd minimal-dev-env
-```
-
-Run the universal installer:
-
-```bash
-bash install-universal.sh
-```
-
----
-
-## ⚙️ Installer Options
+## ⚙️ Installer Flags
 
 | Flag | Description |
 |------|-------------|
-| `--no-code-server` | Skip Code‑Server installation |
+| `--no-docker` | Skip Docker installation (desktop only) |
+| `--no-zsh` | Skip Zsh installation (desktop only) |
+| `--no-code-server` | Skip Code‑Server |
 | `--no-ai` | Skip AI integration |
+| `--minimal-nvim` | Use minimal Neovim config (no Treesitter/LSP/cmp) |
 
-Examples:
-
-Skip Code‑Server:
+### Example
 
 ```bash
-bash install-universal.sh --no-code-server
+bash install-desktop-universal.sh --no-docker --no-zsh --no-code-server --no-ai --minimal-nvim
 ```
 
-Skip AI:
-
 ```bash
-bash install-universal.sh --no-ai
-```
-
-Skip everything optional:
-
-```bash
-bash install-universal.sh --no-code-server --no-ai
+bash install-pizero-unified.sh --no-code-server --no-ai
 ```
 
 ---
 
 ## 🤖 AI Usage
 
-### Set your OpenAI API key
+Set your OpenAI API key:
 
 ```bash
 export OPENAI_API_KEY="your_api_key_here"
@@ -108,21 +99,13 @@ echo 'export OPENAI_API_KEY="your_api_key_here"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### Terminal AI
+Use in terminal:
 
 ```bash
 ai "Explain this code"
 ```
 
-Pipe input:
-
-```bash
-cat main.c | ai "summarize this"
-```
-
-### Neovim AI
-
-Inside Neovim:
+Use in Neovim:
 
 ```
 :ChatGPT
@@ -130,14 +113,50 @@ Inside Neovim:
 
 ---
 
+## 🖥 Code‑Server Usage
+
+Start Code‑Server:
+
+```bash
+systemctl --user start code-server
+```
+
+Then open:
+
+```
+http://<your-device-ip>:8080
+```
+
+---
+
+## 🔍 System Validation
+
+Run:
+
+```bash
+bash validate.sh
+```
+
+Checks:
+
+- OS compatibility (Debian/Ubuntu)
+- APT availability
+- Sudo access
+- Internet connection
+- Disk space (≥ 2GB)
+- Docker group membership
+- GUI availability (optional)
+
+---
+
 ## 📁 Repository Structure
 
 ```
-minimal-dev-env/
+dev-env/
 │
-├── install-universal.sh          # Universal auto-detecting installer
-├── install-pizero-minimal.sh     # Pi Zero minimal installer
-├── install-pizero-unified.sh     # Full Pi Zero installer (optional)
+├── install-desktop-universal.sh     # Desktop/server installer
+├── install-pizero-unified.sh        # Pi Zero unified installer
+├── validate.sh                      # System validation script
 ├── README.md
 ├── CHANGELOG.md
 └── LICENSE
@@ -147,28 +166,16 @@ minimal-dev-env/
 
 ## 🧭 Requirements
 
-- Ubuntu Server, Debian, or Raspberry Pi OS  
-- ARMv7, ARM64, or x86_64  
+- Debian or Ubuntu system  
+- Raspberry Pi Zero 2 W (for Pi installer)  
 - Internet connection  
-- OpenAI API key (optional)  
-
----
-
-## 🧠 Notes on Performance
-
-This universal installer is optimized for:
-
-- Low‑RAM devices (Pi Zero 2 W)  
-- Headless servers  
-- ARMv7 compatibility  
-- Fast Neovim startup  
-- Minimal background services  
+- OpenAI API key (optional for AI features)
 
 ---
 
 ## 🤝 Contributing
 
-PRs and suggestions are welcome.
+PRs and suggestions welcome.
 
 ---
 
