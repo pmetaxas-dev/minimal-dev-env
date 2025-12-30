@@ -18,26 +18,16 @@ Both installers are:
 
 # 🚀 Quick Installation Guide
 
+## 📥 Install Git (if missing)
+
+```bash
+sudo apt update -y && sudo apt install -y git
+```
+
 ## 📥 Clone the repository
 
-### Recommended (fast, shallow clone)
-
 ```bash
-git clone --depth 1 https://github.com/<your-username>/minimal-dev-env.git
-cd minimal-dev-env
-```
-
-### Clone a specific branch
-
-```bash
-git clone --branch main https://github.com/<your-username>/minimal-dev-env.git
-cd minimal-dev-env
-```
-
-### Full clone (includes history)
-
-```bash
-git clone https://github.com/<your-username>/minimal-dev-env.git
+git clone https://github.com/pmetaxas-dev/minimal-dev-env.git
 cd minimal-dev-env
 ```
 
