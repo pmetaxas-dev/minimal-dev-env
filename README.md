@@ -1,14 +1,7 @@
-# Minimal Dev Environment Installer
+# Minimal Dev Environment Installer (Pi Zero 2 W Optimized)
 
-![License](https://img.shields.io/badge/license-Zone01%20Restricted-blue)
-![Platform](https://img.shields.io/badge/platform-Debian%20%2F%20Ubuntu-green)
-![Shell](https://img.shields.io/badge/shell-bash-orange)
-![Status](https://img.shields.io/badge/status-active-success)
-![Contributions](https://img.shields.io/badge/contributions-welcome-brightgreen)
-![Maintained](https://img.shields.io/badge/maintained-yes-blueviolet)
-
-A lightweight, fast, and powerful development environment setup script designed for **Zone01 / 01Edu / 42‑style** workflows.  
-This installer prepares a clean Debian‑based system for a full 2‑year cohort journey, including C programming, system development, networking, DevOps, Rust, Go, Node.js, and more.
+A lightweight, fully automated development environment installer designed for **Raspberry Pi Zero 2 W** and other Debian-based systems.  
+Includes a complete Neovim IDE, optional Code‑Server, optional Docker, and integrated AI support using the OpenAI API.
 
 ---
 
@@ -20,19 +13,27 @@ This installer prepares a clean Debian‑based system for a full 2‑year cohort
 - pkg-config  
 - Git + GitHub CLI  
 - Python3 + pip  
+- Node.js (LTS)  
+- Go  
+- Rust (rustup)
 
 ### 🧑‍💻 Editors & Workflow Tools
-- Neovim (minimal config)  
+- **Neovim IDE** (Treesitter, LSP, Telescope, Autocomplete, Git signs, Lualine)  
 - tmux  
 - ripgrep  
 - fzf  
 - ranger  
 - exa  
 
-### 🧪 Static Analysis & Formatting
-- cppcheck  
-- clang-tidy  
-- clang-format  
+### 🤖 AI Integration (OpenAI)
+- Global `ai` command for terminal AI queries  
+- Neovim AI plugin: **ChatGPT.nvim**  
+- Uses OpenAI API (GPT‑4o‑mini by default)  
+- Optional via `--no-ai` flag  
+
+### 🐳 Optional Components
+- Docker (`--no-docker` to skip)  
+- Code‑Server (VS Code in browser) (`--no-code-server` to skip)
 
 ### 🌐 Networking Tools
 - iproute2  
@@ -41,18 +42,6 @@ This installer prepares a clean Debian‑based system for a full 2‑year cohort
 - nmap  
 - tcpdump  
 
-### 🐳 DevOps & Containers
-- Docker  
-- docker-compose  
-
-### 🦀 Modern Languages
-- Rust (rustup)  
-- Go  
-- Node.js (LTS) + npm  
-
-### 🌍 Lightweight Browser
-- qutebrowser  
-
 ### 🐚 Shell Environment
 - Zsh with clean defaults  
 
@@ -60,35 +49,89 @@ This installer prepares a clean Debian‑based system for a full 2‑year cohort
 
 ## 📦 Installation
 
-Run the installer using:
+Run the unified installer:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/<YOUR_USERNAME>/minimal-dev-env/main/install.sh)
+chmod +x install-pizero-unified.sh
+./install-pizero-unified.sh
 ```
-
-Replace `<YOUR_USERNAME>` with your GitHub username.
 
 ---
 
-## ✅ System Validation (Optional but Recommended)
+## ⚙️ Installer Options
 
-Before running the installer, you can validate your system compatibility using:
+The installer supports optional flags:
+
+| Flag | Description |
+|------|-------------|
+| `--no-docker` | Skip Docker installation |
+| `--no-code-server` | Skip Code‑Server installation |
+| `--no-ai` | Skip AI integration (OpenAI, ChatGPT.nvim, `ai` command) |
+
+### Examples
+
+Skip Docker:
 
 ```bash
-./validate.sh
+./install-pizero-unified.sh --no-docker
 ```
 
-This script checks:
+Skip Code‑Server:
 
-- OS type and version  
-- APT package manager availability  
-- Internet connection  
-- sudo access  
-- disk space  
-- Docker group membership  
-- GUI availability for VS Code (if installed)
+```bash
+./install-pizero-unified.sh --no-code-server
+```
 
-If everything passes, you're ready to install.
+Skip AI:
+
+```bash
+./install-pizero-unified.sh --no-ai
+```
+
+Skip everything optional:
+
+```bash
+./install-pizero-unified.sh --no-docker --no-code-server --no-ai
+```
+
+---
+
+## 🤖 AI Usage
+
+### 1. Set your OpenAI API key
+
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+echo 'export OPENAI_API_KEY="your_api_key_here"' >> ~/.zshrc
+```
+
+### 2. Use the global `ai` command
+
+Ask a question:
+
+```bash
+ai "Explain pointers in C"
+```
+
+Pipe input:
+
+```bash
+cat main.c | ai "Find bugs"
+```
+
+### 3. Use AI inside Neovim
+
+Open Neovim:
+
+```bash
+nvim
+```
+
+Then run:
+
+```
+:ChatGPT
+```
 
 ---
 
@@ -97,41 +140,46 @@ If everything passes, you're ready to install.
 ```
 minimal-dev-env/
 │
-├── install.sh      # Main installer script
-├── validate.sh     # System compatibility checker
-├── README.md       # Documentation
-├── CHANGELOG.md    # Version history
-└── LICENSE         # Zone01-restricted license
+├── install.sh                   # Main desktop installer
+├── install-pizero-unified.sh    # Pi Zero 2 W unified installer (with AI, flags, Neovim IDE)
+├── validate.sh                  # System compatibility checker
+├── README.md                    # Documentation
+├── CHANGELOG.md                 # Version history
+└── LICENSE                      # Zone01-restricted license
 ```
 
 ---
 
 ## 🧭 Requirements
 
-- Debian or Debian-based distribution (Ubuntu, Mint, Pop!\_OS, Kali, etc.)
+- Raspberry Pi Zero 2 W (or any Debian-based system)
 - sudo privileges
 - Internet connection
+- OpenAI API key (optional, for AI features)
 
 ---
 
-## 🛠️ Ideal For
+## 🧠 Notes on Performance
 
-- Zone01 / 01Edu / 42 school projects  
-- C programming (libft, get_next_line, minishell, etc.)  
-- Algorithms & data structures  
-- System programming  
-- Networking projects  
-- Docker & DevOps  
-- Rust, Go, Node.js development  
-- Terminal-first workflows  
-- Lightweight servers or VMs  
+The Pi Zero 2 W is a low-power device.  
+This installer is optimized for:
+
+- terminal-first workflows  
+- lightweight tools  
+- cloud-based AI  
+- Neovim instead of VS Code GUI  
 
 ---
 
 ## 🤝 Contributing
 
 Contributions are welcome.  
-If you want to add optional modules (e.g., full Neovim IDE, .NET, Java, Kubernetes), feel free to open an issue.
+Feel free to open issues or PRs for:
+
+- additional AI providers  
+- new Neovim modules  
+- performance improvements  
+- Pi 4 / Pi 5 optimized versions  
 
 ---
 
