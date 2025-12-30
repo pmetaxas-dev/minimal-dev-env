@@ -8,15 +8,70 @@ This repository provides two fully‑featured, headless‑friendly development e
 
 Both installers are:
 
-- Bash‑only (no Zsh or GUI dependencies)
-- Headless‑compatible
-- AI‑enabled (optional)
-- Code‑Server‑enabled (optional)
-- Neovim‑based IDE (minimal or full)
+- 🟦 Bash‑only (no Zsh or GUI dependencies)  
+- 🟩 Headless‑compatible  
+- 🤖 AI‑enabled (optional)  
+- 🖥 Code‑Server‑enabled (optional)  
+- ✨ Neovim‑based IDE (minimal or full)
 
 ---
 
-## 📦 Installers Overview
+# 🚀 Quick Installation Guide
+
+## 📥 Clone the repository
+
+### Recommended (fast, shallow clone)
+
+```bash
+git clone --depth 1 https://github.com/<your-username>/minimal-dev-env.git
+cd minimal-dev-env
+```
+
+### Clone a specific branch
+
+```bash
+git clone --branch main https://github.com/<your-username>/minimal-dev-env.git
+cd minimal-dev-env
+```
+
+### Full clone (includes history)
+
+```bash
+git clone https://github.com/<your-username>/minimal-dev-env.git
+cd minimal-dev-env
+```
+
+---
+
+# 🖥 Desktop / Server Installation (Ubuntu or Debian)
+
+```bash
+bash install-desktop-universal.sh
+```
+
+Minimal install example:
+
+```bash
+bash install-desktop-universal.sh --no-docker --no-zsh --no-code-server --no-ai --minimal-nvim
+```
+
+---
+
+# 🍓 Raspberry Pi Zero 2 W Installation (Raspberry Pi OS Legacy 64‑bit)
+
+```bash
+bash install-pizero-unified.sh
+```
+
+Minimal install example:
+
+```bash
+bash install-pizero-unified.sh --no-code-server --no-ai
+```
+
+---
+
+# 📦 Installers Overview
 
 ### 🖥 Desktop/Server Installer  
 **File:** `install-desktop-universal.sh`  
@@ -35,9 +90,9 @@ Both installers are:
 
 ---
 
-## 🚀 Features
+# 🔧 Features
 
-### Core Tools
+## 🧱 Core Tools
 - GCC, Make, CMake  
 - Git, curl, wget  
 - Python3 + pip  
@@ -48,26 +103,71 @@ Both installers are:
 - Static analysis tools (clang-tidy, cppcheck)  
 - Networking tools (nmap, tcpdump, traceroute)
 
-### Neovim IDE
-- Minimal mode: Telescope, Git signs, Lualine  
-- Full mode: Treesitter, LSP servers, Autocomplete (cmp), ChatGPT.nvim  
-- Lazy.nvim plugin manager  
-- Bash‑based config
+---
 
-### AI Integration (Optional)
-- `ai` CLI using OpenAI API  
-- ChatGPT.nvim inside Neovim  
-- GPT‑4o‑mini by default  
-- Bash‑only, no GUI required
+## ✨ Neovim IDE
 
-### Code‑Server (Optional)
-- Browser‑based VS Code  
-- Runs on port `8080`  
-- Systemd user service
+### Minimal Mode
+- Telescope  
+- Git signs  
+- Lualine  
+- No Treesitter  
+- No LSP  
+- No autocomplete  
+
+### Full Mode
+- Treesitter  
+- LSP servers  
+- Autocomplete (cmp)  
+- Telescope  
+- Git signs  
+- Lualine  
+- ChatGPT.nvim  
+
+Both modes use **Lazy.nvim** as the plugin manager.
 
 ---
 
-## ⚙️ Installer Flags
+## 🤖 AI Integration (Optional)
+
+### Terminal AI
+```bash
+ai "Explain this code"
+```
+
+### Neovim AI
+Inside Neovim:
+
+```
+:ChatGPT
+```
+
+### Set your API key
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+echo 'export OPENAI_API_KEY="your_api_key_here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+---
+
+## 🖥 Code‑Server (Optional)
+
+Start Code‑Server:
+
+```bash
+systemctl --user start code-server
+```
+
+Then open in your browser:
+
+```
+http://<your-device-ip>:8080
+```
+
+---
+
+# ⚙️ Installer Flags
 
 | Flag | Description |
 |------|-------------|
@@ -77,67 +177,17 @@ Both installers are:
 | `--no-ai` | Skip AI integration |
 | `--minimal-nvim` | Use minimal Neovim config (no Treesitter/LSP/cmp) |
 
-### Example
-
-```bash
-bash install-desktop-universal.sh --no-docker --no-zsh --no-code-server --no-ai --minimal-nvim
-```
-
-```bash
-bash install-pizero-unified.sh --no-code-server --no-ai
-```
-
 ---
 
-## 🤖 AI Usage
+# 🔍 System Validation
 
-Set your OpenAI API key:
-
-```bash
-export OPENAI_API_KEY="your_api_key_here"
-echo 'export OPENAI_API_KEY="your_api_key_here"' >> ~/.bashrc
-source ~/.bashrc
-```
-
-Use in terminal:
-
-```bash
-ai "Explain this code"
-```
-
-Use in Neovim:
-
-```
-:ChatGPT
-```
-
----
-
-## 🖥 Code‑Server Usage
-
-Start Code‑Server:
-
-```bash
-systemctl --user start code-server
-```
-
-Then open:
-
-```
-http://<your-device-ip>:8080
-```
-
----
-
-## 🔍 System Validation
-
-Run:
+Before installing, you can validate your system:
 
 ```bash
 bash validate.sh
 ```
 
-Checks:
+This checks:
 
 - OS compatibility (Debian/Ubuntu)
 - APT availability
@@ -149,10 +199,10 @@ Checks:
 
 ---
 
-## 📁 Repository Structure
+# 📁 Repository Structure
 
 ```
-dev-env/
+minimal-dev-env/
 │
 ├── install-desktop-universal.sh     # Desktop/server installer
 ├── install-pizero-unified.sh        # Pi Zero unified installer
@@ -164,7 +214,7 @@ dev-env/
 
 ---
 
-## 🧭 Requirements
+# 🧭 Requirements
 
 - Debian or Ubuntu system  
 - Raspberry Pi Zero 2 W (for Pi installer)  
@@ -173,12 +223,12 @@ dev-env/
 
 ---
 
-## 🤝 Contributing
+# 🤝 Contributing
 
 PRs and suggestions welcome.
 
 ---
 
-## 📜 License
+# 📜 License
 
 This project is licensed under the **Zone01 Restricted License**.
