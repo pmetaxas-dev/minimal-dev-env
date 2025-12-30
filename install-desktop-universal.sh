@@ -537,4 +537,4 @@ if [ "$INSTALL_DOCKER" = true ]; then
 fi
 echo
 
-
+echo "USB import script available: ./import-env-from-usb.sh"
