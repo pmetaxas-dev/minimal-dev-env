@@ -8,11 +8,12 @@ This repository provides two fully‑featured, headless‑friendly development e
 
 Both installers are:
 
-- 🟦 Bash‑only (no Zsh or GUI dependencies)  
+- 🟦 Bash‑only (no GUI dependencies required)  
 - 🟩 Headless‑compatible  
 - 🤖 AI‑enabled (optional)  
 - 🖥 Code‑Server‑enabled (optional)  
-- ✨ Neovim‑based IDE (minimal or full)
+- ✨ Neovim‑based IDE (minimal or full)  
+- 🧭 Include browser options (Chromium or Falkon)
 
 ---
 
@@ -42,7 +43,7 @@ bash install-desktop-universal.sh
 Minimal install example:
 
 ```bash
-bash install-desktop-universal.sh --no-docker --no-zsh --no-code-server --no-ai --minimal-nvim
+bash install-desktop-universal.sh --no-docker --no-zsh --no-code-server --no-ai --minimal-nvim --no-chromium
 ```
 
 ---
@@ -56,7 +57,7 @@ bash install-pizero-unified.sh
 Minimal install example:
 
 ```bash
-bash install-pizero-unified.sh --no-code-server --no-ai
+bash install-pizero-unified.sh --no-code-server --no-ai --no-falkon
 ```
 
 ---
@@ -70,6 +71,7 @@ bash install-pizero-unified.sh --no-code-server --no-ai
 - Debian  
 - Headless desktops  
 - Cloud VMs  
+- Users who want Chromium + full Neovim IDE
 
 ### 🍓 Pi Zero Installer  
 **File:** `install-pizero-unified.sh`  
@@ -77,6 +79,7 @@ bash install-pizero-unified.sh --no-code-server --no-ai
 - Raspberry Pi Zero 2 W  
 - Raspberry Pi OS Legacy (64‑bit)  
 - ARMv7 systems  
+- Users who want Falkon + minimal Neovim IDE
 
 ---
 
@@ -86,12 +89,22 @@ bash install-pizero-unified.sh --no-code-server --no-ai
 - GCC, Make, CMake  
 - Git, curl, wget  
 - Python3 + pip  
-- Go, Rust, Node.js (Debian version)  
-- ripgrep, fzf, fd, ranger, eza  
+- Go, Rust, Node.js  
+- ripgrep, fzf, fd, ranger, eza (via cargo)  
 - tmux, jq, ncdu, htop  
 - w3m terminal browser  
 - Static analysis tools (clang-tidy, cppcheck)  
 - Networking tools (nmap, tcpdump, traceroute)
+
+---
+
+## 🌐 Browsers
+
+### Desktop Installer
+- **Chromium** (optional)
+
+### Pi Zero Installer
+- **Falkon** (optional, lightweight QtWebEngine browser)
 
 ---
 
@@ -165,7 +178,9 @@ http://<your-device-ip>:8080
 | `--no-zsh` | Skip Zsh installation (desktop only) |
 | `--no-code-server` | Skip Code‑Server |
 | `--no-ai` | Skip AI integration |
-| `--minimal-nvim` | Use minimal Neovim config (no Treesitter/LSP/cmp) |
+| `--no-chromium` | Skip Chromium browser (desktop only) |
+| `--no-falkon` | Skip Falkon browser (Pi only) |
+| `--minimal-nvim` | Use minimal Neovim config |
 
 ---
 
