@@ -1,65 +1,73 @@
-# Minimal Dev Environment Installer (Pi Zero 2 W Optimized)
+# Minimal Dev Environment Installer (Pi Zero 2 W – Minimal Edition)
 
-A lightweight, fully automated development environment installer designed for **Raspberry Pi Zero 2 W** and other Debian-based systems.  
-Includes a complete Neovim IDE, optional Code‑Server, optional Docker, and integrated AI support using the OpenAI API.
+A lightweight, Pi‑optimized development environment installer designed for **Raspberry Pi Zero 2 W** running **Raspberry Pi OS (Legacy, 64‑bit) Lite**.
+
+This version is **ultra‑minimal**:
+
+- ❌ No Treesitter  
+- ❌ No LSP servers  
+- ❌ No autocomplete  
+- ❌ No Docker  
+- ❌ No Zsh  
+- ✔ Bash‑only  
+- ✔ Neovim minimal IDE  
+- ✔ Optional AI integration  
+- ✔ Optional Code‑Server  
+- ✔ Extremely low RAM usage  
 
 ---
 
 ## 🚀 Features
 
 ### 🧱 Core Development Tools
-- GCC, Clang, Make, CMake  
-- GDB, Valgrind  
-- pkg-config  
-- Git + GitHub CLI  
+- GCC, Make, CMake  
+- Git  
 - Python3 + pip  
-- Node.js (LTS)  
 - Go  
-- Rust (rustup)
-
-### 🧑‍💻 Editors & Workflow Tools
-- **Neovim IDE** (Treesitter, LSP, Telescope, Autocomplete, Git signs, Lualine)  
+- Rust (rustup)  
+- Node.js (Debian version for ARMv7 stability)  
+- ripgrep, fzf, fd, ranger, eza  
 - tmux  
-- ripgrep  
-- fzf  
-- ranger  
-- exa  
+- jq  
+- w3m terminal browser  
 
-### 🤖 AI Integration (OpenAI)
-- Global `ai` command for terminal AI queries  
-- Neovim AI plugin: **ChatGPT.nvim**  
-- Uses OpenAI API (GPT‑4o‑mini by default)  
-- Optional via `--no-ai` flag  
+### 🧑‍💻 Minimal Neovim IDE
+- Telescope (fuzzy finder)  
+- Git signs  
+- Lualine statusline  
+- **No Treesitter**  
+- **No LSP**  
+- **No autocomplete**  
+- Fast startup, low memory footprint  
 
-### 🐳 Optional Components
-- Docker (`--no-docker` to skip)  
-- Code‑Server (VS Code in browser) (`--no-code-server` to skip)
+### 🤖 AI Integration (Optional)
+- Global `ai` command (OpenAI API)  
+- ChatGPT.nvim inside Neovim  
+- Uses GPT‑4o‑mini by default  
+- Bash‑only environment  
 
-### 🌐 Networking Tools
-- iproute2  
-- iputils-ping  
-- traceroute  
-- nmap  
-- tcpdump  
+### 🖥 Code‑Server (Optional)
+Run VS Code in your browser:
 
-### 🐚 Shell Environment (Bash Only)
-
-The installer now uses **bash** as the default and only shell.
-
-- No Zsh is installed
-- No shell switching occurs
-- AI keys and environment variables are added to `~/.bashrc`
-- Neovim is set as the default editor for bash
+```
+http://<pi-ip>:8080
+```
 
 ---
 
 ## 📦 Installation
 
-Run the unified installer:
+Clone the repo:
 
 ```bash
-chmod +x install-pizero-unified.sh
-./install-pizero-unified.sh
+git clone https://github.com/<your-username>/minimal-dev-env.git
+cd minimal-dev-env
+```
+
+Run the installer:
+
+```bash
+bash install-pizero-minimal.sh
 ```
 
 ---
@@ -69,42 +77,33 @@ chmod +x install-pizero-unified.sh
 | Flag | Description |
 |------|-------------|
 | `--no-code-server` | Skip Code‑Server installation |
-| `--no-ai` | Skip AI integration (OpenAI, ChatGPT.nvim, `ai` command) |
+| `--no-ai` | Skip AI integration |
 
-### Note  
-Docker has been **fully removed** from the Pi Zero installer because it is too heavy for the device and causes memory pressure.
-
-### Examples
-
-Skip Docker:
-
-```bash
-./install-pizero-unified.sh --no-docker
-```
+Examples:
 
 Skip Code‑Server:
 
 ```bash
-./install-pizero-unified.sh --no-code-server
+bash install-pizero-minimal.sh --no-code-server
 ```
 
 Skip AI:
 
 ```bash
-./install-pizero-unified.sh --no-ai
+bash install-pizero-minimal.sh --no-ai
 ```
 
 Skip everything optional:
 
 ```bash
-./install-pizero-unified.sh --no-docker --no-code-server --no-ai
+bash install-pizero-minimal.sh --no-code-server --no-ai
 ```
 
 ---
 
 ## 🤖 AI Usage
 
-### Set your OpenAI API key (bash)
+### Set your OpenAI API key
 
 ```bash
 export OPENAI_API_KEY="your_api_key_here"
@@ -112,29 +111,21 @@ echo 'export OPENAI_API_KEY="your_api_key_here"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### 2. Use the global `ai` command
-
-Ask a question:
+### Terminal AI
 
 ```bash
-ai "Explain pointers in C"
+ai "Explain this code"
 ```
 
 Pipe input:
 
 ```bash
-cat main.c | ai "Find bugs"
+cat main.c | ai "summarize this"
 ```
 
-### 3. Use AI inside Neovim
+### Neovim AI
 
-Open Neovim:
-
-```bash
-nvim
-```
-
-Then run:
+Inside Neovim:
 
 ```
 :ChatGPT
@@ -147,52 +138,44 @@ Then run:
 ```
 minimal-dev-env/
 │
-├── install.sh                   # Main desktop installer
-├── install-pizero-unified.sh    # Pi Zero 2 W unified installer (with AI, flags, Neovim IDE)
-├── validate.sh                  # System compatibility checker
-├── README.md                    # Documentation
-├── CHANGELOG.md                 # Version history
-└── LICENSE                      # Zone01-restricted license
+├── install-pizero-minimal.sh     # Minimal Pi Zero installer
+├── install-pizero-unified.sh     # Full Pi Zero installer (optional)
+├── README.md
+├── CHANGELOG.md
+└── LICENSE
 ```
 
 ---
 
 ## 🧭 Requirements
 
-- Raspberry Pi Zero 2 W (or any Debian-based system)
-- sudo privileges
-- Internet connection
-- OpenAI API key (optional, for AI features)
+- Raspberry Pi Zero 2 W  
+- Raspberry Pi OS (Legacy, 64‑bit) Lite  
+- Internet connection  
+- OpenAI API key (optional)  
 
 ---
 
 ## 🧠 Notes on Performance
 
-The Pi Zero 2 W is a low-power device.  
-This installer is optimized for:
+This minimal edition is optimized for:
 
-- terminal-first workflows  
-- lightweight tools  
-- cloud-based AI  
-- Neovim instead of VS Code GUI  
+- 512MB RAM  
+- ARMv7 CPU  
+- Low I/O  
+- Fast boot  
+- Fast Neovim startup  
+
+It is the recommended version for Pi Zero 2 W.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome.  
-Feel free to open issues or PRs for:
-
-- additional AI providers  
-- new Neovim modules  
-- performance improvements  
-- Pi 4 / Pi 5 optimized versions  
+PRs and suggestions are welcome.
 
 ---
 
 ## 📜 License
 
-This project is licensed under the **Zone01 Restricted License**.  
-Only Zone01 students and mentors may use, modify, or distribute this software.
-
-See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Zone01 Restricted License**.
