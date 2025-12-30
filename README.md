@@ -1,5 +1,5 @@
 # 🧰 Universal Dev Environment Installers  
-### For Desktop/Server and Raspberry Pi Zero 2 W (Headless, Bash‑Only)
+### For Desktop/Server and Raspberry Pi Zero 2 W (Headless‑First, GUI‑Optional)
 
 This repository provides two fully‑featured, headless‑friendly development environment installers:
 
@@ -8,12 +8,13 @@ This repository provides two fully‑featured, headless‑friendly development e
 
 Both installers are:
 
-- 🟦 Bash‑only (no GUI dependencies required)  
+- 🟦 Bash‑only (no GUI required)  
 - 🟩 Headless‑compatible  
+- 🖥 Optional lightweight GUI (XFCE or Openbox)  
+- 🌐 Browser‑ready (Chromium or Falkon)  
 - 🤖 AI‑enabled (optional)  
-- 🖥 Code‑Server‑enabled (optional)  
 - ✨ Neovim‑based IDE (minimal or full)  
-- 🧭 Include browser options (Chromium or Falkon)
+- 🖥 Code‑Server‑enabled (optional)
 
 ---
 
@@ -62,24 +63,37 @@ bash install-pizero-unified.sh --no-code-server --no-ai --no-falkon
 
 ---
 
-# 📦 Installers Overview
+# 🧭 GUI Support (Optional)
 
-### 🖥 Desktop/Server Installer  
-**File:** `install-desktop-universal.sh`  
-**Best for:**  
-- Ubuntu Server  
-- Debian  
-- Headless desktops  
-- Cloud VMs  
-- Users who want Chromium + full Neovim IDE
+Both installers now include **lightweight graphical environments**, but **they do NOT start automatically**.  
+Your system will still boot into **pure terminal mode**.
 
-### 🍓 Pi Zero Installer  
-**File:** `install-pizero-unified.sh`  
-**Best for:**  
-- Raspberry Pi Zero 2 W  
-- Raspberry Pi OS Legacy (64‑bit)  
-- ARMv7 systems  
-- Users who want Falkon + minimal Neovim IDE
+### 🖥 Desktop Installer → XFCE Minimal
+- Lightweight, stable, full desktop environment  
+- Browser support: **Chromium**  
+- Launch manually:
+
+```bash
+startx
+```
+
+### 🍓 Pi Zero Installer → Openbox Ultra‑Minimal
+- Extremely lightweight window manager  
+- Browser support: **Falkon**  
+- Launch manually:
+
+```bash
+startx
+```
+
+### Disable GUI autostart (already applied)
+Both installers run:
+
+```bash
+sudo systemctl set-default multi-user.target
+```
+
+This ensures **CLI‑only boot**, even with GUI installed.
 
 ---
 
