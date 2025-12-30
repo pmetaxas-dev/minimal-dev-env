@@ -42,8 +42,14 @@ Includes a complete Neovim IDE, optional Code‑Server, optional Docker, and int
 - nmap  
 - tcpdump  
 
-### 🐚 Shell Environment
-- Zsh with clean defaults  
+### 🐚 Shell Environment (Bash Only)
+
+The installer now uses **bash** as the default and only shell.
+
+- No Zsh is installed
+- No shell switching occurs
+- AI keys and environment variables are added to `~/.bashrc`
+- Neovim is set as the default editor for bash
 
 ---
 
