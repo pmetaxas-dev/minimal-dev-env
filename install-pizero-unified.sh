@@ -125,6 +125,24 @@ sudo apt install -y golang
 echo "==> Installing Node.js (Debian version)"
 sudo apt install -y nodejs npm
 
+#######################################
+# Openbox Ultra-Minimal GUI (optional)
+#######################################
+
+echo "==> Installing Openbox (ultra-minimal GUI)"
+
+sudo apt install -y \
+  openbox \
+  obconf \
+  tint2 \
+  xorg \
+  --no-install-recommends
+
+# Prevent GUI from starting automatically
+sudo systemctl set-default multi-user.target
+
+echo "Openbox installed. Launch manually with: startx"
+
 ############################################
 # Falkon lightweight browser (optional)
 ############################################
