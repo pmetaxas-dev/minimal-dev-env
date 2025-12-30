@@ -1,19 +1,15 @@
-# Minimal Dev Environment Installer (Pi Zero 2 W – Minimal Edition)
+# Universal Minimal Dev Environment Installer  
+### (Ubuntu Server • Debian • Raspberry Pi OS • Pi Zero 2 W Optimized)
 
-A lightweight, Pi‑optimized development environment installer designed for **Raspberry Pi Zero 2 W** running **Raspberry Pi OS (Legacy, 64‑bit) Lite**.
+This project provides a **universal**, **auto‑detecting**, **minimal** development environment installer that works across:
 
-This version is **ultra‑minimal**:
+- **Ubuntu Server (headless)**
+- **Debian**
+- **Raspberry Pi OS (Legacy, 64‑bit)**
+- **Raspberry Pi Zero 2 W**
+- **ARMv7 / ARM64 / x86_64**
 
-- ❌ No Treesitter  
-- ❌ No LSP servers  
-- ❌ No autocomplete  
-- ❌ No Docker  
-- ❌ No Zsh  
-- ✔ Bash‑only  
-- ✔ Neovim minimal IDE  
-- ✔ Optional AI integration  
-- ✔ Optional Code‑Server  
-- ✔ Extremely low RAM usage  
+The installer automatically detects your OS and architecture and configures a **lightweight, stable, bash‑only development environment**.
 
 ---
 
@@ -25,7 +21,7 @@ This version is **ultra‑minimal**:
 - Python3 + pip  
 - Go  
 - Rust (rustup)  
-- Node.js (Debian version for ARMv7 stability)  
+- Node.js (Debian version for ARM stability)  
 - ripgrep, fzf, fd, ranger, eza  
 - tmux  
 - jq  
@@ -34,11 +30,12 @@ This version is **ultra‑minimal**:
 ### 🧑‍💻 Minimal Neovim IDE
 - Telescope (fuzzy finder)  
 - Git signs  
-- Lualine statusline  
+- Lualine  
 - **No Treesitter**  
 - **No LSP**  
 - **No autocomplete**  
-- Fast startup, low memory footprint  
+- Fast startup, low memory usage  
+- Perfect for Pi Zero 2 W  
 
 ### 🤖 AI Integration (Optional)
 - Global `ai` command (OpenAI API)  
@@ -50,7 +47,7 @@ This version is **ultra‑minimal**:
 Run VS Code in your browser:
 
 ```
-http://<pi-ip>:8080
+http://<device-ip>:8080
 ```
 
 ---
@@ -64,10 +61,10 @@ git clone https://github.com/<your-username>/minimal-dev-env.git
 cd minimal-dev-env
 ```
 
-Run the installer:
+Run the universal installer:
 
 ```bash
-bash install-pizero-minimal.sh
+bash install-universal.sh
 ```
 
 ---
@@ -84,19 +81,19 @@ Examples:
 Skip Code‑Server:
 
 ```bash
-bash install-pizero-minimal.sh --no-code-server
+bash install-universal.sh --no-code-server
 ```
 
 Skip AI:
 
 ```bash
-bash install-pizero-minimal.sh --no-ai
+bash install-universal.sh --no-ai
 ```
 
 Skip everything optional:
 
 ```bash
-bash install-pizero-minimal.sh --no-code-server --no-ai
+bash install-universal.sh --no-code-server --no-ai
 ```
 
 ---
@@ -138,7 +135,8 @@ Inside Neovim:
 ```
 minimal-dev-env/
 │
-├── install-pizero-minimal.sh     # Minimal Pi Zero installer
+├── install-universal.sh          # Universal auto-detecting installer
+├── install-pizero-minimal.sh     # Pi Zero minimal installer
 ├── install-pizero-unified.sh     # Full Pi Zero installer (optional)
 ├── README.md
 ├── CHANGELOG.md
@@ -149,8 +147,8 @@ minimal-dev-env/
 
 ## 🧭 Requirements
 
-- Raspberry Pi Zero 2 W  
-- Raspberry Pi OS (Legacy, 64‑bit) Lite  
+- Ubuntu Server, Debian, or Raspberry Pi OS  
+- ARMv7, ARM64, or x86_64  
 - Internet connection  
 - OpenAI API key (optional)  
 
@@ -158,15 +156,13 @@ minimal-dev-env/
 
 ## 🧠 Notes on Performance
 
-This minimal edition is optimized for:
+This universal installer is optimized for:
 
-- 512MB RAM  
-- ARMv7 CPU  
-- Low I/O  
-- Fast boot  
+- Low‑RAM devices (Pi Zero 2 W)  
+- Headless servers  
+- ARMv7 compatibility  
 - Fast Neovim startup  
-
-It is the recommended version for Pi Zero 2 W.
+- Minimal background services  
 
 ---
 
