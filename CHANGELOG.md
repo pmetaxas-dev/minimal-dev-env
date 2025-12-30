@@ -1,30 +1,46 @@
-# Changelog
+# CHANGELOG
 
-All notable changes to this project will be documented in this file.
+## [1.4.0] – 2025-12-30
+### Added
+- Full AI integration using the OpenAI API
+- Global `ai` command for terminal-based AI queries
+- Neovim AI plugin: ChatGPT.nvim
+- New installer flags:
+  - `--no-ai`
+  - `--no-docker`
+  - `--no-code-server`
+- Unified Pi Zero 2 W installer with:
+  - Neovim IDE (Treesitter, LSP, Telescope, cmp, Git signs, Lualine)
+  - Optional Code‑Server
+  - Optional Docker
+  - Rust, Go, Node.js, Python3
+  - Zsh environment
+- Updated README to document AI usage and installer flags
+
+### Changed
+- Consolidated all Pi Zero setup steps into a single unified installer
+- Improved validation logic and error messages
+- Simplified Neovim configuration structure
+
+### Fixed
+- fd/fdfind aliasing on Debian-based systems
+- Missing dependencies for ChatGPT.nvim (plenary, nui)
 
 ---
 
-## [1.1.0] - 2025-12-30
-### Added
-- Rust installation via rustup  
-- Go installation  
-- Node.js LTS installation  
-- Lightweight browser (qutebrowser)  
-- Badge-rich README  
-- Custom Zone01-only LICENSE  
-- CHANGELOG.md file  
+## [1.3.0] – Previous Release
+- Added Pi Zero optimized installer
+- Added minimal Neovim config
+- Added Code‑Server support
+- Added Docker support
 
----
+## [1.2.0]
+- Added validation script
+- Added static analysis tools
 
-## [1.0.0] - 2025-12-29
-### Added
-- Core development tools (GCC, Clang, Make, GDB, Valgrind)  
-- Neovim minimal configuration  
-- tmux, ripgrep, fzf, ranger, exa  
-- Static analysis tools (cppcheck, clang-tidy, clang-format)  
-- Networking tools (nmap, traceroute, tcpdump)  
-- Docker + docker-compose  
-- GitHub CLI  
-- VS Code installation  
-- Zsh configuration  
-- Initial installer script  
+## [1.1.0]
+- Added core development tools
+- Added networking tools
+
+## [1.0.0]
+- Initial release
