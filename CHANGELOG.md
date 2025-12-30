@@ -1,29 +1,35 @@
 # CHANGELOG
 
-## [2.1.0] – 2025‑12‑30
+## [2.2.0] – 2025‑12‑30
 ### Added
-- Chromium browser installation to `install-desktop-universal.sh`
-- Falkon lightweight browser installation to `install-pizero-unified.sh`
-- New flags:
-  - `--no-chromium` (desktop)
-  - `--no-falkon` (Pi Zero)
-- eza installation via cargo (replaces broken apt package)
+- **XFCE minimal desktop** to `install-desktop-universal.sh`
+- **Openbox ultra‑minimal GUI** to `install-pizero-unified.sh`
+- GUI is **disabled by default** using `systemctl set-default multi-user.target`
+- Manual GUI launch instructions (`startx`)
 - Updated README with:
-  - Correct git clone command using `pmetaxas-dev`
-  - Browser support section
+  - GUI section
+  - Browser compatibility notes
   - Updated flags table
   - Updated installation examples
 
 ### Changed
-- Desktop installer now installs Chromium instead of relying on system defaults
-- Pi installer now installs Falkon for lightweight GUI browsing
-- eza removed from apt list and installed via cargo
-- README reorganized for clarity and consistency
+- Browser support:
+  - Desktop → Chromium
+  - Pi Zero → Falkon
+- README reorganized for clarity and GUI integration
 - Improved installer descriptions and feature lists
 
 ### Fixed
-- eza “Unable to locate package” error on Debian/Ubuntu/Pi OS
-- Missing browser support for Code‑Server UI on Pi Zero
+- eza installation now uses cargo (APT package removed)
+- Falkon/Chromium documentation updated to reflect GUI requirements
+
+---
+
+## [2.1.0]
+- Added Chromium browser to desktop installer
+- Added Falkon browser to Pi installer
+- Added `--no-chromium` and `--no-falkon` flags
+- Updated README and flags table
 
 ---
 
