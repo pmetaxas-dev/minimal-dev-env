@@ -70,12 +70,35 @@ Replace `<YOUR_USERNAME>` with your GitHub username.
 
 ---
 
+## ✅ System Validation (Optional but Recommended)
+
+Before running the installer, you can validate your system compatibility using:
+
+```bash
+./validate.sh
+```
+
+This script checks:
+
+- OS type and version  
+- APT package manager availability  
+- Internet connection  
+- sudo access  
+- disk space  
+- Docker group membership  
+- GUI availability for VS Code (if installed)
+
+If everything passes, you're ready to install.
+
+---
+
 ## 📁 Repository Structure
 
 ```
 minimal-dev-env/
 │
 ├── install.sh      # Main installer script
+├── validate.sh     # System compatibility checker
 ├── README.md       # Documentation
 ├── CHANGELOG.md    # Version history
 └── LICENSE         # Zone01-restricted license
