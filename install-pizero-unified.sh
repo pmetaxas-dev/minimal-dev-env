@@ -8,15 +8,11 @@ echo "==> Raspberry Pi Zero 2 W unified dev environment installer"
 # Parse flags
 #######################################
 
-INSTALL_DOCKER=true
 INSTALL_CODE_SERVER=true
 INSTALL_AI=true
 
 for arg in "$@"; do
   case $arg in
-    --no-docker)
-      INSTALL_DOCKER=false
-      ;;
     --no-code-server)
       INSTALL_CODE_SERVER=false
       ;;
@@ -88,18 +84,6 @@ sudo apt install -y cppcheck clang-tidy clang-format
 
 echo "==> Installing networking tools"
 sudo apt install -y iproute2 iputils-ping traceroute nmap tcpdump
-
-#######################################
-# Docker (optional)
-#######################################
-
-if [ "$INSTALL_DOCKER" = true ]; then
-  echo "==> Installing Docker"
-  sudo apt install -y docker.io
-  sudo usermod -aG docker "$USER"
-else
-  echo "⚠️  Skipping Docker (--no-docker)"
-fi
 
 #######################################
 # Languages
