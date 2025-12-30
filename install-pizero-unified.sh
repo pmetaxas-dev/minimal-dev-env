@@ -2,7 +2,7 @@
 
 set -e
 
-echo "==> Raspberry Pi Zero 2 W unified dev environment installer"
+echo "==> Raspberry Pi Zero 2 W MINIMAL dev environment installer"
 
 #######################################
 # Parse flags
@@ -22,7 +22,6 @@ for arg in "$@"; do
     *)
       echo "Unknown option: $arg"
       echo "Available options:"
-      echo "  --no-docker"
       echo "  --no-code-server"
       echo "  --no-ai"
       exit 1
@@ -74,16 +73,9 @@ sudo apt upgrade -y
 
 echo "==> Installing core development tools"
 sudo apt install -y \
-    build-essential clang gdb valgrind make cmake pkg-config \
-    git curl wget python3 python3-pip tmux neovim ripgrep fzf \
-    htop ncdu netcat-openbsd openssh-client manpages-dev jq \
-    ranger exa ca-certificates unzip fd-find lua5.4
-
-echo "==> Installing static analysis tools"
-sudo apt install -y cppcheck clang-tidy clang-format
-
-echo "==> Installing networking tools"
-sudo apt install -y iproute2 iputils-ping traceroute nmap tcpdump
+    build-essential git curl wget python3 python3-pip \
+    tmux neovim ripgrep fzf htop ncdu jq ranger eza \
+    ca-certificates unzip fd-find lua5.4
 
 #######################################
 # Languages
@@ -96,9 +88,8 @@ source "$HOME/.cargo/env"
 echo "==> Installing Go"
 sudo apt install -y golang
 
-echo "==> Installing Node.js LTS"
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-sudo apt install -y nodejs
+echo "==> Installing Node.js (Debian version)"
+sudo apt install -y nodejs npm
 
 #######################################
 # Terminal browser
@@ -119,17 +110,18 @@ else
 fi
 
 #######################################
-# Neovim IDE (Treesitter, LSP, Telescope, cmp, lualine, ChatGPT.nvim)
+# Minimal Neovim config (NO Treesitter, NO LSP)
 #######################################
 
 echo "==> Installing lazy.nvim"
 git clone https://github.com/folke/lazy.nvim ~/.local/share/nvim/lazy/lazy.nvim 2>/dev/null || true
 
-echo "==> Writing Neovim IDE config"
+echo "==> Writing minimal Neovim config"
 mkdir -p ~/.config/nvim
 
 cat << 'EOF' > ~/.config/nvim/init.lua
--- Basic options
+-- Minimal Neovim config for Pi Zero 2 W
+
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.tabstop = 4
@@ -145,68 +137,12 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 
-    -- Treesitter
-    {
-        "nvim-treesitter/nvim-treesitter",
-        build = ":TSUpdate",
-        config = function()
-            require("nvim-treesitter.configs").setup({
-                ensure_installed = { "c", "lua", "rust", "go", "javascript", "python" },
-                highlight = { enable = true },
-            })
-        end
-    },
-
-    -- Telescope
+    -- Telescope (lightweight fuzzy finder)
     {
         "nvim-telescope/telescope.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         config = function()
             require("telescope").setup({})
-        end
-    },
-
-    -- LSP
-    {
-        "neovim/nvim-lspconfig",
-        config = function()
-            local lsp = require("lspconfig")
-            lsp.clangd.setup({})
-            lsp.rust_analyzer.setup({})
-            lsp.gopls.setup({})
-            lsp.tsserver.setup({})
-            lsp.pyright.setup({})
-        end
-    },
-
-    -- Autocomplete
-    {
-        "hrsh7th/nvim-cmp",
-        dependencies = {
-            "hrsh7th/cmp-nvim-lsp",
-            "hrsh7th/cmp-buffer",
-            "hrsh7th/cmp-path",
-            "L3MON4D3/LuaSnip"
-        },
-        config = function()
-            local cmp = require("cmp")
-            cmp.setup({
-                snippet = {
-                    expand = function(args)
-                        require("luasnip").lsp_expand(args.body)
-                    end,
-                },
-                mapping = cmp.mapping.preset.insert({
-                    ["<Tab>"] = cmp.mapping.select_next_item(),
-                    ["<S-Tab>"] = cmp.mapping.select_prev_item(),
-                    ["<CR>"] = cmp.mapping.confirm({ select = true }),
-                }),
-                sources = cmp.config.sources({
-                    { name = "nvim_lsp" },
-                    { name = "buffer" },
-                    { name = "path" },
-                })
-            })
         end
     },
 
@@ -245,21 +181,12 @@ require("lazy").setup({
 EOF
 
 #######################################
-# LSP servers
-#######################################
-
-echo "==> Installing LSP servers"
-sudo apt install -y clangd gopls pyright
-rustup component add rust-analyzer || true
-sudo npm install -g typescript-language-server typescript
-
-#######################################
 # AI CLI (OpenAI)
 #######################################
 
 if [ "$INSTALL_AI" = true ]; then
   echo "==> Installing OpenAI CLI support"
-  pip install --upgrade openai
+  pip install --upgrade "openai>=1.0.0"
 
   sudo tee /usr/local/bin/ai >/dev/null << 'EOF'
 #!/usr/bin/env bash
@@ -291,19 +218,17 @@ else
 fi
 
 #######################################
-# Shell Environment (Bash Only)
+# Bash Environment
 #######################################
 
 echo "==> Configuring Bash environment"
 
-# Ensure OPENAI_API_KEY persists in bash
 if [ "$INSTALL_AI" = true ]; then
   if ! grep -q "OPENAI_API_KEY" ~/.bashrc; then
     echo 'export OPENAI_API_KEY="$OPENAI_API_KEY"' >> ~/.bashrc
   fi
 fi
 
-# Set Neovim as default editor
 if ! grep -q "EDITOR=nvim" ~/.bashrc; then
   echo 'export EDITOR=nvim' >> ~/.bashrc
   echo 'export VISUAL=nvim' >> ~/.bashrc
@@ -314,14 +239,11 @@ fi
 #######################################
 
 echo
-echo "==> Installation complete!"
-echo "Neovim IDE: run 'nvim'"
+echo "==> Minimal installation complete!"
+echo "Neovim: nvim"
 echo "Neovim AI: :ChatGPT"
 echo "Terminal AI: ai \"your question\""
 if [ "$INSTALL_CODE_SERVER" = true ]; then
   echo "Code-Server: systemctl --user start code-server"
-fi
-if [ "$INSTALL_DOCKER" = true ]; then
-  echo "Docker installed — log out and back in to activate group changes."
 fi
 echo
