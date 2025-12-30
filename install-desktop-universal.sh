@@ -191,6 +191,24 @@ echo "==> Installing Node.js (Debian/Ubuntu version) + npm"
 sudo apt install -y nodejs npm
 
 #######################################
+# XFCE Minimal Desktop (optional)
+#######################################
+
+echo "==> Installing minimal XFCE environment (disabled by default)"
+
+sudo apt install -y \
+  xfce4 \
+  xfce4-terminal \
+  xorg \
+  lightdm-gtk-greeter \
+  --no-install-recommends
+
+# Prevent GUI from starting automatically
+sudo systemctl set-default multi-user.target
+
+echo "XFCE installed. Launch manually with: startx"
+
+#######################################
 # Chromium Browser (optional)
 #######################################
 
@@ -518,4 +536,5 @@ if [ "$INSTALL_DOCKER" = true ]; then
   echo "Docker: log out and back in to use 'docker' without sudo."
 fi
 echo
+
 
