@@ -1,27 +1,30 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-echo "==> Universal desktop/server dev environment installer (headless-friendly)"
+echo "==> Zone01 headless dev environment installer (Debian/Ubuntu)"
 
 #######################################
-# Flags
+# Flags (headless defaults)
 #######################################
-
 INSTALL_DOCKER=true
 INSTALL_ZSH=true
 INSTALL_CODE_SERVER=true
 INSTALL_AI=true
-INSTALL_CHROMIUM=true
+INSTALL_EZA=true
+INSTALL_XFCE=false
+INSTALL_CHROMIUM=false
 NVIM_MODE="full"  # "full" or "minimal"
 
 for arg in "$@"; do
   case "$arg" in
-    --no-docker) INSTALL_DOCKER=false ;;
-    --no-zsh) INSTALL_ZSH=false ;;
+    --no-docker)      INSTALL_DOCKER=false ;;
+    --no-zsh)         INSTALL_ZSH=false ;;
     --no-code-server) INSTALL_CODE_SERVER=false ;;
-    --no-ai) INSTALL_AI=false ;;
-    --no-chromium) INSTALL_CHROMIUM=false ;;
-    --minimal-nvim) NVIM_MODE="minimal" ;;
+    --no-ai)          INSTALL_AI=false ;;
+    --no-eza)         INSTALL_EZA=false ;;
+    --with-xfce)      INSTALL_XFCE=true ;;
+    --with-chromium)  INSTALL_CHROMIUM=true ;;
+    --minimal-nvim)   NVIM_MODE="minimal" ;;
     *)
       echo "Unknown option: $arg"
       echo "Available options:"
@@ -29,7 +32,9 @@ for arg in "$@"; do
       echo "  --no-zsh"
       echo "  --no-code-server"
       echo "  --no-ai"
-      echo "  --no-chromium"
+      echo "  --no-eza"
+      echo "  --with-xfce"
+      echo "  --with-chromium"
       echo "  --minimal-nvim"
       exit 1
       ;;
@@ -39,7 +44,6 @@ done
 #######################################
 # Detect OS + basic validation
 #######################################
-
 echo "==> Detecting OS"
 
 if ! [ -f /etc/os-release ]; then
@@ -68,14 +72,16 @@ if ! sudo -v >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1; then
-  echo "❌ No internet connection."
+# More reliable than ping (ICMP may be blocked)
+if ! curl -fsSL https://deb.debian.org/ >/dev/null 2>&1 && ! curl -fsSL https://archive.ubuntu.com/ >/dev/null 2>&1; then
+  echo "❌ No working HTTPS connectivity to distro mirrors."
   exit 1
 fi
 
-FREE_SPACE=$(df / | tail -1 | awk '{print $4}')
-if [ "$FREE_SPACE" -lt 2000000 ]; then
-  echo "❌ Not enough disk space (need 2GB free)."
+# Ensure 2GB free on /
+FREE_SPACE_KB="$(df -Pk / | awk 'NR==2{print $4}')"
+if [ "${FREE_SPACE_KB}" -lt 2000000 ]; then
+  echo "❌ Not enough disk space (need ~2GB free on /)."
   exit 1
 fi
 
@@ -84,6 +90,7 @@ echo "✅ Validation passed"
 #######################################
 # Core tools
 #######################################
+export DEBIAN_FRONTEND=noninteractive
 
 echo "==> Updating system"
 sudo apt update -y
@@ -103,6 +110,7 @@ sudo apt install -y \
   wget \
   python3 \
   python3-pip \
+  python3-venv \
   tmux \
   neovim \
   ripgrep \
@@ -113,46 +121,32 @@ sudo apt install -y \
   openssh-client \
   manpages-dev \
   jq \
-  ranger \
   ca-certificates \
   unzip \
   fd-find \
   w3m \
-  w3m-img
+  w3m-img \
+  iproute2 \
+  iputils-ping \
+  traceroute \
+  nmap \
+  tcpdump
 
-#######################################
-# eza (via cargo)
-#######################################
-
-echo "==> Installing eza (modern ls replacement)"
-if ! command -v cargo >/dev/null 2>&1; then
-  echo "Installing Rust first (cargo required for eza)"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-  source "$HOME/.cargo/env"
+# Convenience symlink: fd-find installs as "fdfind" on Debian/Ubuntu
+mkdir -p "$HOME/.local/bin"
+if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
+  ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
 fi
-
-cargo install eza
-echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
 
 #######################################
 # Static analysis tools
 #######################################
-
 echo "==> Installing static analysis tools"
 sudo apt install -y cppcheck clang-tidy clang-format
 
 #######################################
-# Networking tools
-#######################################
-
-echo "==> Installing networking tools"
-sudo apt install -y iproute2 iputils-ping traceroute nmap tcpdump
-
-#######################################
 # Docker (optional)
 #######################################
-
 if [ "$INSTALL_DOCKER" = true ]; then
   echo "==> Installing Docker"
   sudo apt install -y docker.io docker-compose-plugin
@@ -165,7 +159,6 @@ fi
 #######################################
 # GitHub CLI
 #######################################
-
 echo "==> Installing GitHub CLI"
 type -p curl >/dev/null || sudo apt install -y curl
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
@@ -179,70 +172,91 @@ sudo apt install -y gh
 #######################################
 # Languages
 #######################################
-
-echo "==> Installing Rust (rustup)"
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-source "$HOME/.cargo/env"
-
 echo "==> Installing Go"
 sudo apt install -y golang
 
-echo "==> Installing Node.js (Debian/Ubuntu version) + npm"
+echo "==> Installing Node.js (distro) + npm"
 sudo apt install -y nodejs npm
 
-#######################################
-# XFCE Minimal Desktop (optional)
-#######################################
-
-echo "==> Installing minimal XFCE environment (disabled by default)"
-
-sudo apt install -y \
-  xfce4 \
-  xfce4-terminal \
-  xorg \
-  lightdm-gtk-greeter \
-  --no-install-recommends
-
-# Prevent GUI from starting automatically
-sudo systemctl set-default multi-user.target
-
-echo "XFCE installed. Launch manually with: startx"
+echo "==> Installing Rust (rustup)"
+if ! command -v cargo >/dev/null 2>&1; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+fi
 
 #######################################
-# Chromium Browser (optional)
+# eza (optional)
 #######################################
+if [ "$INSTALL_EZA" = true ]; then
+  echo "==> Installing eza"
+  if sudo apt install -y eza >/dev/null 2>&1; then
+    :
+  else
+    # Fallback: install via cargo if apt doesn't have it
+    # shellcheck disable=SC1090
+    source "$HOME/.cargo/env"
+    cargo install eza
+  fi
+else
+  echo "⚠️ Skipping eza (--no-eza)"
+fi
+
+#######################################
+# Headless defaults: XFCE/Chromium disabled unless requested
+#######################################
+if [ "$INSTALL_XFCE" = true ]; then
+  echo "==> Installing minimal XFCE environment (requested)"
+  sudo apt install -y \
+    xfce4 \
+    xfce4-terminal \
+    xorg \
+    lightdm-gtk-greeter \
+    --no-install-recommends
+
+  # Prevent GUI from starting automatically
+  sudo systemctl set-default multi-user.target
+  echo "XFCE installed. Launch manually with: startx"
+else
+  echo "==> Skipping XFCE (headless default). Use --with-xfce to install."
+fi
 
 if [ "$INSTALL_CHROMIUM" = true ]; then
-  echo "==> Installing Chromium browser"
-  sudo apt install -y chromium-browser || sudo apt install -y chromium
+  echo "==> Installing Chromium (requested)"
+  # On Ubuntu, chromium-browser is often a snap; keep best-effort for both distros.
+  sudo apt install -y chromium || sudo apt install -y chromium-browser
 else
-  echo "⚠️ Skipping Chromium (--no-chromium)"
+  echo "==> Skipping Chromium (headless default). Use --with-chromium to install."
 fi
 
 #######################################
 # Code-Server (optional)
 #######################################
-
 if [ "$INSTALL_CODE_SERVER" = true ]; then
-  echo "==> Installing Code-Server"
+  echo "==> Installing code-server"
   curl -fsSL https://code-server.dev/install.sh | sh
+
+  # Enable as a system service (recommended in code-server docs)
+  # Service name is typically code-server@<user>
+  if systemctl list-unit-files | grep -q "^code-server@"; then
+    sudo systemctl enable --now "code-server@${USER}"
+  else
+    echo "⚠️ code-server systemd unit not found. You can run it manually: code-server"
+  fi
 else
-  echo "⚠️ Skipping Code-Server (--no-code-server)"
+  echo "⚠️ Skipping code-server (--no-code-server)"
 fi
 
 #######################################
 # Neovim IDE (minimal or full)
 #######################################
-
 echo "==> Installing lazy.nvim"
-git clone https://github.com/folke/lazy.nvim ~/.local/share/nvim/lazy/lazy.nvim 2>/dev/null || true
+git clone https://github.com/folke/lazy.nvim "$HOME/.local/share/nvim/lazy/lazy.nvim" 2>/dev/null || true
 
 echo "==> Writing Neovim config ($NVIM_MODE mode)"
-mkdir -p ~/.config/nvim
+mkdir -p "$HOME/.config/nvim"
 
 if [ "$NVIM_MODE" = "minimal" ]; then
-  cat << 'EOF' > ~/.config/nvim/init.lua
--- Minimal Neovim config (no Treesitter, no LSP, no cmp)
+  cat << 'EOF' > "$HOME/.config/nvim/init.lua"
+-- Minimal Neovim config (Telescope, Git signs, Lualine)
 
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -257,8 +271,6 @@ local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-
-  -- Telescope
   {
     "nvim-telescope/telescope.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -266,45 +278,23 @@ require("lazy").setup({
       require("telescope").setup({})
     end
   },
-
-  -- Git signs
   {
     "lewis6991/gitsigns.nvim",
     config = function()
       require("gitsigns").setup()
     end
   },
-
-  -- Statusline
   {
     "nvim-lualine/lualine.nvim",
     config = function()
-      require("lualine").setup({
-        options = { theme = "auto" }
-      })
+      require("lualine").setup({ options = { theme = "auto" } })
     end
   },
-
-  -- ChatGPT.nvim (AI)
-  {
-    "jackMort/ChatGPT.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim"
-    },
-    config = function()
-      require("chatgpt").setup({
-        api_key_cmd = "echo $OPENAI_API_KEY"
-      })
-    end
-  }
-
 })
 EOF
-
 else
-  cat << 'EOF' > ~/.config/nvim/init.lua
--- Full Neovim IDE: Treesitter, LSP, cmp, Telescope, Git signs, Lualine, ChatGPT.nvim
+  cat << 'EOF' > "$HOME/.config/nvim/init.lua"
+-- Full Neovim IDE: Treesitter, LSP, cmp, Telescope, Git signs, Lualine
 
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -318,9 +308,11 @@ vim.opt.cursorline = true
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
+local function exe(cmd)
+  return vim.fn.executable(cmd) == 1
+end
 
-  -- Treesitter
+require("lazy").setup({
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
@@ -331,8 +323,6 @@ require("lazy").setup({
       })
     end
   },
-
-  -- Telescope
   {
     "nvim-telescope/telescope.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -340,22 +330,18 @@ require("lazy").setup({
       require("telescope").setup({})
     end
   },
-
-  -- LSP
   {
     "neovim/nvim-lspconfig",
     config = function()
       local lsp = require("lspconfig")
-      lsp.clangd.setup({})
-      lsp.pyright.setup({})
-      lsp.lua_ls.setup({})
-      lsp.rust_analyzer.setup({})
-      lsp.gopls.setup({})
-      lsp.tsserver.setup({})
+      if exe("clangd") then lsp.clangd.setup({}) end
+      if exe("pyright-langserver") then lsp.pyright.setup({}) end
+      if exe("lua-language-server") then lsp.lua_ls.setup({}) end
+      if exe("rust-analyzer") then lsp.rust_analyzer.setup({}) end
+      if exe("gopls") then lsp.gopls.setup({}) end
+      if exe("typescript-language-server") then lsp.tsserver.setup({}) end
     end
   },
-
-  -- Autocomplete
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
@@ -385,39 +371,18 @@ require("lazy").setup({
       })
     end
   },
-
-  -- Git signs
   {
     "lewis6991/gitsigns.nvim",
     config = function()
       require("gitsigns").setup()
     end
   },
-
-  -- Statusline
   {
     "nvim-lualine/lualine.nvim",
     config = function()
-      require("lualine").setup({
-        options = { theme = "auto" }
-      })
+      require("lualine").setup({ options = { theme = "auto" } })
     end
   },
-
-  -- ChatGPT.nvim (AI)
-  {
-    "jackMort/ChatGPT.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim"
-    },
-    config = function()
-      require("chatgpt").setup({
-        api_key_cmd = "echo $OPENAI_API_KEY"
-      })
-    end
-  }
-
 })
 EOF
 fi
@@ -425,56 +390,91 @@ fi
 #######################################
 # LSP servers (for full mode)
 #######################################
-
 if [ "$NVIM_MODE" = "full" ]; then
-  echo "==> Installing LSP servers"
-  sudo apt install -y clangd pyright lua-language-server
+  echo "==> Installing LSP servers (best-effort)"
+  sudo apt install -y clangd || true
+
+  # Python LSP: pyright via npm (more reliable than apt on Debian/Ubuntu)
+  sudo npm install -g pyright || true
+
+  # Rust analyzer via rustup
+  # shellcheck disable=SC1090
+  source "$HOME/.cargo/env"
   rustup component add rust-analyzer || true
-  sudo npm install -g typescript-language-server typescript
+
+  # TypeScript LSP
+  sudo npm install -g typescript typescript-language-server || true
+
+  # Go LSP (gopls) via 'go install' (works with distro Go)
+  if command -v go >/dev/null 2>&1; then
+    GOBIN="$HOME/.local/bin" go install golang.org/x/tools/gopls@latest || true
+  fi
+
+  # lua-language-server is optional and not consistently packaged; skip by default.
 fi
 
 ############################################
-# AI CLI (OpenAI)
+# AI CLI (OpenAI) (optional) - venv-based
 ############################################
-
 if [ "$INSTALL_AI" = true ]; then
-  echo "==> Installing OpenAI CLI"
-  pip install --break-system-packages --upgrade "openai>=1.0.0"
+  echo "==> Installing OpenAI Python SDK in a venv"
+  AI_VENV="$HOME/.local/share/zone01-ai-venv"
+  python3 -m venv "$AI_VENV"
+  "$AI_VENV/bin/pip" install --upgrade pip
+  "$AI_VENV/bin/pip" install --upgrade openai
 
+  echo "==> Installing /usr/local/bin/ai helper"
   sudo tee /usr/local/bin/ai >/dev/null << 'EOF'
 #!/usr/bin/env bash
-if [ -z "$OPENAI_API_KEY" ]; then
+set -euo pipefail
+
+if [ -z "${OPENAI_API_KEY:-}" ]; then
   echo "❌ OPENAI_API_KEY is not set."
+  echo "Set it for your shell session, for example:"
+  echo '  export OPENAI_API_KEY="your_key_here"'
   exit 1
 fi
 
-python3 - "$@" << 'PYEOF'
-from openai import OpenAI
+AI_VENV="$HOME/.local/share/zone01-ai-venv"
+PY="$AI_VENV/bin/python3"
+
+if [ ! -x "$PY" ]; then
+  echo "❌ AI venv not found at: $AI_VENV"
+  echo "Re-run the installer with AI enabled."
+  exit 1
+fi
+
+# Allow: ai "prompt..."  OR: echo "prompt" | ai
+"$PY" - "$@" << 'PYEOF'
+import os
 import sys
+from openai import OpenAI
 
 client = OpenAI()
 
-# sys.argv[1:] now contains the actual arguments from the shell
+model = os.environ.get("OPENAI_MODEL", "gpt-5.2")
+
 if len(sys.argv) > 1:
     prompt = " ".join(sys.argv[1:])
 else:
     prompt = sys.stdin.read().strip()
 
 if not prompt:
-    print("❌ No prompt provided.")
+    print("❌ No prompt provided.", file=sys.stderr)
     sys.exit(1)
 
-resp = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[{"role": "user", "content": prompt}]
+resp = client.responses.create(
+    model=model,
+    input=prompt,
 )
 
-print(resp.choices[0].message.content)
+print(resp.output_text)
 PYEOF
-
 EOF
 
   sudo chmod +x /usr/local/bin/ai
+
+  echo "==> Note: OPENAI_API_KEY is not persisted automatically (recommended)."
 else
   echo "⚠️ Skipping AI (--no-ai)"
 fi
@@ -482,70 +482,67 @@ fi
 #######################################
 # Zsh (optional)
 #######################################
-
 if [ "$INSTALL_ZSH" = true ]; then
   echo "==> Installing Zsh (no auto shell switch)"
   sudo apt install -y zsh
 
-  cat << 'EOF' > ~/.zshrc
+  cat << 'EOF' > "$HOME/.zshrc"
 export EDITOR=nvim
 export VISUAL=nvim
-
-# Fuzzy finder
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Better history
 HISTSIZE=50000
 SAVEHIST=50000
 setopt hist_ignore_all_dups
+
+# User-local bin
+export PATH="$HOME/.local/bin:$PATH"
 EOF
 
-  echo "⚠️ Zsh installed. If you want to use it as your default shell, run:"
+  echo "⚠️ Zsh installed. If you want it as default shell:"
   echo "    chsh -s /usr/bin/zsh"
 else
   echo "⚠️ Skipping Zsh (--no-zsh)"
 fi
 
 #######################################
-# Bash environment
+# Bash environment (non-interactive safe)
 #######################################
-
 echo "==> Configuring Bash environment"
-
-if [ "$INSTALL_AI" = true ]; then
-  if ! grep -q "OPENAI_API_KEY" ~/.bashrc 2>/dev/null; then
-    echo 'export OPENAI_API_KEY="$OPENAI_API_KEY"' >> ~/.bashrc
-  fi
+if ! grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.bashrc" 2>/dev/null; then
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
 fi
 
-if ! grep -q "EDITOR=nvim" ~/.bashrc 2>/dev/null; then
-  echo 'export EDITOR=nvim' >> ~/.bashrc
-  echo 'export VISUAL=nvim' >> ~/.bashrc
+if ! grep -q "EDITOR=nvim" "$HOME/.bashrc" 2>/dev/null; then
+  echo 'export EDITOR=nvim' >> "$HOME/.bashrc"
+  echo 'export VISUAL=nvim' >> "$HOME/.bashrc"
 fi
 
 #######################################
 # Done
 #######################################
-
 echo
 echo "==> Installation complete!"
 echo "Neovim: nvim"
-echo "Neovim AI: :ChatGPT"
+
 if [ "$INSTALL_AI" = true ]; then
-  echo "Terminal AI: ai \"your question\""
+  echo "Terminal AI:"
+  echo '  export OPENAI_API_KEY="your_key_here"'
+  echo '  ai "your question"'
+  echo "Optional model override:"
+  echo '  export OPENAI_MODEL="gpt-5.2"'
 fi
+
 if [ "$INSTALL_CODE_SERVER" = true ]; then
-  echo "Code-Server: systemctl --user start code-server"
-  echo "Then open: http://<your-server-ip>:8080"
+  echo "code-server:"
+  echo "  systemctl status code-server@${USER} --no-pager  (if enabled)"
+  echo "  open: http://<server-ip>:8080"
+  echo "  password: ~/.config/code-server/config.yaml"
 fi
-if [ "$INSTALL_CHROMIUM" = true ]; then
-  echo "Chromium installed: run 'chromium' or 'chromium-browser'"
-fi
+
 if [ "$INSTALL_DOCKER" = true ]; then
   echo "Docker: log out and back in to use 'docker' without sudo."
 fi
+
+echo "PATH changes apply to new shells. Reconnect SSH or start a new session."
 echo
-
-echo "USB import script available: ./import-env-from-usb.sh"
-
-
