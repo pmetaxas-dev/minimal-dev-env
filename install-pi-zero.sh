@@ -248,13 +248,21 @@ if [ -z "$OPENAI_API_KEY" ]; then
   exit 1
 fi
 
-python3 - << 'PYEOF'
+python3 - "$@" << 'PYEOF'
 from openai import OpenAI
 import sys
 
 client = OpenAI()
 
-prompt = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read()
+# sys.argv[1:] now contains the actual arguments from the shell
+if len(sys.argv) > 1:
+    prompt = " ".join(sys.argv[1:])
+else:
+    prompt = sys.stdin.read().strip()
+
+if not prompt:
+    print("❌ No prompt provided.")
+    sys.exit(1)
 
 resp = client.chat.completions.create(
     model="gpt-4o-mini",
