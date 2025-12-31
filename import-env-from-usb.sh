@@ -9,18 +9,11 @@ echo "==> Importing .env from USB"
 
 echo "==> Detecting USB device..."
 
-# Find the most recently added /dev/sdX1 device
-USB_DEV=$(lsblk -o NAME,TYPE | grep "disk" | awk '{print $1}' | tail -n 1)
+# Detect external USB device (ignore mmcblk and loop)
+USB_PART=$(lsblk -nrpo NAME,TYPE | grep "part" | grep -vE "mmcblk|loop" | awk '{print $1}' | head -n 1)
 
-if [ -z "$USB_DEV" ]; then
-  echo "❌ No USB device detected."
-  exit 1
-fi
-
-USB_PART="/dev/${USB_DEV}1"
-
-if [ ! -b "$USB_PART" ]; then
-  echo "❌ USB partition not found: $USB_PART"
+if [ -z "$USB_PART" ] || [ ! -b "$USB_PART" ]; then
+  echo "❌ No valid USB partition found."
   exit 1
 fi
 
