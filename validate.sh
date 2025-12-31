@@ -51,4 +51,4 @@ if command -v code >/dev/null 2>&1; then
   fi
 fi
 
-echo "✅ System validation complete. You may now run: ./install.sh"
+echo "✅ System validation complete. You may now run: bash install-pi-zero.sh or bash install-desktop-universal.sh"
