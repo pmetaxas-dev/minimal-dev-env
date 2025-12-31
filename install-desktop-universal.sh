@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -e
 
 echo "==> Universal desktop/server dev environment installer (headless-friendly)"
 
@@ -547,4 +547,5 @@ fi
 echo
 
 echo "USB import script available: ./import-env-from-usb.sh"
+
 
