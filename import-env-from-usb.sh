@@ -16,7 +16,7 @@ if [ -z "$USB_PART" ] || [ ! -b "$USB_PART" ]; then
   exit 1
 fi
 
-echo "Detected USB partition: $USB_PART"
+echo "📦 Detected USB partition: $USB_PART"
 
 
 ############################################
@@ -25,9 +25,10 @@ echo "Detected USB partition: $USB_PART"
 
 MOUNT_DIR="/mnt/usb"
 
-echo "==> Mounting USB to $MOUNT_DIR"
+echo "🔧 Mounting USB to $MOUNT_DIR"
 sudo mkdir -p "$MOUNT_DIR"
 sudo mount "$USB_PART" "$MOUNT_DIR"
+
 
 ############################################
 # Import .env
@@ -39,20 +40,41 @@ if [ ! -f "$MOUNT_DIR/.env" ]; then
   exit 1
 fi
 
-echo "==> Copying .env to home directory"
+echo "📥 Copying .env to home directory"
 cp "$MOUNT_DIR/.env" "$HOME/.env"
 chmod 600 "$HOME/.env"
+
+
+############################################
+# Auto‑load .env on every shell startup
+############################################
+
+echo "⚙️  Ensuring ~/.env is sourced automatically"
+
+# Create file if missing (safety)
+touch "$HOME/.env"
+chmod 600 "$HOME/.env"
+
+# Add sourcing line if not already present
+if ! grep -q 'source ~/.env' "$HOME/.bashrc"; then
+    echo 'source ~/.env' >> "$HOME/.bashrc"
+    echo "🔗 Added 'source ~/.env' to ~/.bashrc"
+else
+    echo "🔗 ~/.env already sourced in ~/.bashrc"
+fi
+
 
 ############################################
 # Cleanup
 ############################################
 
-echo "==> Unmounting USB"
+echo "🔌 Unmounting USB"
 sudo umount "$MOUNT_DIR"
 
-echo "==> .env imported successfully!"
-echo "Your OpenAI API key is now available to the system."
 echo
-echo "If your shell does not load it automatically, run:"
-echo "  source ~/.env"
+echo "🎉 .env imported successfully!"
+echo "🔑 Your OpenAI API key is now active and will load automatically in every new shell."
+echo
+echo "Try it now:"
+echo "  ai \"hello\""
 echo
