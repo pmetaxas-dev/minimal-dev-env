@@ -248,7 +248,7 @@ if [ -z "$OPENAI_API_KEY" ]; then
   exit 1
 fi
 
-python3 - << PYEOF
+python3 - << 'PYEOF'
 from openai import OpenAI
 import sys
 
@@ -261,8 +261,9 @@ resp = client.chat.completions.create(
     messages=[{"role": "user", "content": prompt}]
 )
 
-print(resp.choices[0].message["content"])
+print(resp.choices[0].message.content)
 PYEOF
+
 EOF
 
   sudo chmod +x /usr/local/bin/ai
