@@ -433,9 +433,9 @@ if [ "$NVIM_MODE" = "full" ]; then
   sudo npm install -g typescript-language-server typescript
 fi
 
-#######################################
+############################################
 # AI CLI (OpenAI)
-#######################################
+############################################
 
 if [ "$INSTALL_AI" = true ]; then
   echo "==> Installing OpenAI CLI"
@@ -448,21 +448,30 @@ if [ -z "$OPENAI_API_KEY" ]; then
   exit 1
 fi
 
-python3 - << PYEOF
+python3 - "$@" << 'PYEOF'
 from openai import OpenAI
 import sys
 
 client = OpenAI()
 
-prompt = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else sys.stdin.read()
+# sys.argv[1:] now contains the actual arguments from the shell
+if len(sys.argv) > 1:
+    prompt = " ".join(sys.argv[1:])
+else:
+    prompt = sys.stdin.read().strip()
+
+if not prompt:
+    print("❌ No prompt provided.")
+    sys.exit(1)
 
 resp = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[{"role": "user", "content": prompt}]
 )
 
-print(resp.choices[0].message["content"])
+print(resp.choices[0].message.content)
 PYEOF
+
 EOF
 
   sudo chmod +x /usr/local/bin/ai
@@ -538,3 +547,4 @@ fi
 echo
 
 echo "USB import script available: ./import-env-from-usb.sh"
+
