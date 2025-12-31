@@ -63,6 +63,19 @@ else
     echo "🔗 ~/.env already sourced in ~/.bashrc"
 fi
 
+############################################
+# Ensure ~/.profile loads ~/.bashrc
+############################################
+
+echo "⚙️  Ensuring ~/.profile loads ~/.bashrc"
+
+if ! grep -q 'source ~/.bashrc' "$HOME/.profile"; then
+    echo 'source ~/.bashrc' >> "$HOME/.profile"
+    echo "🔗 Added 'source ~/.bashrc' to ~/.profile"
+else
+    echo "🔗 ~/.bashrc already sourced in ~/.profile"
+fi
+
 
 ############################################
 # Cleanup
