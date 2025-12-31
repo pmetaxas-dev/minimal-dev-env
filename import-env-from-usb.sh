@@ -9,8 +9,8 @@ echo "==> Importing .env from USB"
 
 echo "==> Detecting USB device..."
 
-# Detect external USB device (ignore mmcblk and loop)
-USB_PART=$(lsblk -nrpo NAME,TYPE | grep "part" | grep -vE "mmcblk|loop" | awk '{print $1}' | head -n 1)
+# Detect external USB partition (ignore internal mmcblk and loop devices)
+USB_PART=$(lsblk -nrpo NAME,TYPE,TRAN | grep "part" | grep "usb" | awk '{print $1}' | head -n 1)
 
 if [ -z "$USB_PART" ] || [ ! -b "$USB_PART" ]; then
   echo "❌ No valid USB partition found."
