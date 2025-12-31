@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eu
+set -o pipefail 2>/dev/null || true
 
 echo "==> Zone01 headless dev environment installer (Debian/Ubuntu)"
 
@@ -546,3 +547,4 @@ fi
 
 echo "PATH changes apply to new shells. Reconnect SSH or start a new session."
 echo
+
