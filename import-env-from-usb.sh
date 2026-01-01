@@ -18,7 +18,6 @@ fi
 
 echo "📦 Detected USB partition: $USB_PART"
 
-
 ############################################
 # Mount USB
 ############################################
@@ -28,7 +27,6 @@ MOUNT_DIR="/mnt/usb"
 echo "🔧 Mounting USB to $MOUNT_DIR"
 sudo mkdir -p "$MOUNT_DIR"
 sudo mount "$USB_PART" "$MOUNT_DIR"
-
 
 ############################################
 # Import .env
@@ -44,38 +42,25 @@ echo "📥 Copying .env to home directory"
 cp "$MOUNT_DIR/.env" "$HOME/.env"
 chmod 600 "$HOME/.env"
 
-
 ############################################
-# Auto‑load .env on every shell startup
+# Ensure .env loads on every shell startup
+# (Pi Zero autologin loads ONLY /etc/bash.bashrc)
 ############################################
 
-echo "⚙️  Ensuring ~/.env is sourced automatically"
+echo "⚙️ Ensuring /etc/bash.bashrc loads ~/.env"
 
-# Create file if missing (safety)
-touch "$HOME/.env"
-chmod 600 "$HOME/.env"
+if ! grep -q 'source "$HOME/.env"' /etc/bash.bashrc; then
+  sudo tee -a /etc/bash.bashrc >/dev/null << 'EOF'
 
-# Add sourcing line if not already present
-if ! grep -q 'source ~/.env' "$HOME/.bashrc"; then
-    echo 'source ~/.env' >> "$HOME/.bashrc"
-    echo "🔗 Added 'source ~/.env' to ~/.bashrc"
-else
-    echo "🔗 ~/.env already sourced in ~/.bashrc"
+# Load user environment variables
+if [ -f "$HOME/.env" ]; then
+    source "$HOME/.env"
 fi
-
-############################################
-# Ensure ~/.profile loads ~/.bashrc
-############################################
-
-echo "⚙️  Ensuring ~/.profile loads ~/.bashrc"
-
-if ! grep -q 'source ~/.bashrc' "$HOME/.profile"; then
-    echo 'source ~/.bashrc' >> "$HOME/.profile"
-    echo "🔗 Added 'source ~/.bashrc' to ~/.profile"
+EOF
+  echo "🔗 Added .env sourcing to /etc/bash.bashrc"
 else
-    echo "🔗 ~/.bashrc already sourced in ~/.profile"
+  echo "🔗 /etc/bash.bashrc already sources ~/.env"
 fi
-
 
 ############################################
 # Cleanup
@@ -86,7 +71,7 @@ sudo umount "$MOUNT_DIR"
 
 echo
 echo "🎉 .env imported successfully!"
-echo "🔑 Your OpenAI API key is now active and will load automatically in every new shell."
+echo "🔑 Your OpenAI API key will now load automatically in every new shell."
 echo
 echo "Try it now:"
 echo "  ai \"hello\""
