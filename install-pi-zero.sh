@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-echo "==> Universal Minimal Dev Environment Installer"
+echo "==> Universal Minimal Dev Environment Installer (Pi-friendly, headless)"
 
 ############################################
 # Detect OS + Architecture
@@ -10,7 +10,6 @@ echo "==> Universal Minimal Dev Environment Installer"
 OS=""
 ARCH=""
 
-# Detect OS
 if grep -qi "ubuntu" /etc/os-release; then
   OS="ubuntu"
 elif grep -qi "raspbian" /etc/os-release; then
@@ -22,8 +21,7 @@ else
   exit 1
 fi
 
-# Detect architecture
-ARCH=$(uname -m)
+ARCH="$(uname -m)"
 
 echo "Detected OS: $OS"
 echo "Detected Architecture: $ARCH"
@@ -34,25 +32,20 @@ echo "Detected Architecture: $ARCH"
 
 INSTALL_CODE_SERVER=true
 INSTALL_AI=true
-INSTALL_FALKON=true
 
 for arg in "$@"; do
-  case $arg in
+  case "$arg" in
     --no-code-server)
       INSTALL_CODE_SERVER=false
       ;;
     --no-ai)
       INSTALL_AI=false
       ;;
-    --no-falkon)
-      INSTALL_FALKON=false
-      ;;
     *)
       echo "Unknown option: $arg"
       echo "Available options:"
       echo "  --no-code-server"
       echo "  --no-ai"
-      echo "  --no-falkon"
       exit 1
       ;;
   esac
@@ -74,7 +67,7 @@ if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1; then
   exit 1
 fi
 
-FREE_SPACE=$(df / | tail -1 | awk '{print $4}')
+FREE_SPACE="$(df / | tail -1 | awk '{print $4}')"
 if [ "$FREE_SPACE" -lt 2000000 ]; then
   echo "❌ Not enough disk space (need 2GB free)."
   exit 1
@@ -101,19 +94,15 @@ sudo apt install -y \
   ca-certificates unzip fd-find lua5.4 w3m w3m-img
 
 ############################################
-# Install eza (via cargo)
+# eza (modern ls) via apt if available
 ############################################
 
-echo "==> Installing eza (modern ls replacement)"
-if ! command -v cargo >/dev/null 2>&1; then
-  echo "Installing Rust first (cargo required for eza)"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-  source "$HOME/.cargo/env"
+echo "==> Installing eza (if available in repos)"
+if sudo apt install -y eza 2>/dev/null; then
+  echo "✅ eza installed from apt"
+else
+  echo "⚠️ eza package not available in repos, skipping"
 fi
-
-cargo install eza
-echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
 
 ############################################
 # Install languages
@@ -130,6 +119,12 @@ sudo apt install -y nodejs npm
 ############################################
 
 if [ "$INSTALL_CODE_SERVER" = true ]; then
+  # Pi Zero friendly warning
+  if [ "$ARCH" = "armv6l" ] || [ "$ARCH" = "armv7l" ]; then
+    echo "⚠️ Code-Server can be heavy on low-RAM devices like Pi Zero."
+    echo "   If it fails or is too slow, reinstall with --no-code-server."
+  fi
+
   echo "==> Installing Code-Server"
   curl -fsSL https://code-server.dev/install.sh | sh
 else
@@ -214,8 +209,9 @@ if [ "$INSTALL_AI" = true ]; then
 
   sudo tee /usr/local/bin/ai >/dev/null << 'EOF'
 #!/usr/bin/env bash
-if [ -z "$OPENAI_API_KEY" ]; then
+if [ -z "${OPENAI_API_KEY:-}" ]; then
   echo "❌ OPENAI_API_KEY is not set."
+  echo "   Make sure your .env is imported and sourced (e.g. via your USB import script)."
   exit 1
 fi
 
@@ -225,7 +221,6 @@ import sys
 
 client = OpenAI()
 
-# sys.argv[1:] now contains the actual arguments from the shell
 if len(sys.argv) > 1:
     prompt = " ".join(sys.argv[1:])
 else:
@@ -242,7 +237,6 @@ resp = client.chat.completions.create(
 
 print(resp.choices[0].message.content)
 PYEOF
-
 EOF
 
   sudo chmod +x /usr/local/bin/ai
@@ -251,20 +245,16 @@ else
 fi
 
 ############################################
-# Bash environment
+# Bash environment (minimal, no .env touching)
 ############################################
 
-echo "==> Configuring Bash"
+echo "==> Configuring Bash (EDITOR only, no API key logic)"
 
-if [ "$INSTALL_AI" = true ]; then
-  if ! grep -q "OPENAI_API_KEY" ~/.bashrc; then
-    echo 'export OPENAI_API_KEY="$OPENAI_API_KEY"' >> ~/.bashrc
-  fi
-fi
-
-if ! grep -q "EDITOR=nvim" ~/.bashrc; then
-  echo 'export EDITOR=nvim' >> ~/.bashrc
-  echo 'export VISUAL=nvim' >> ~/.bashrc
+if ! grep -q "EDITOR=nvim" "${HOME}/.bashrc" 2>/dev/null; then
+  {
+    echo 'export EDITOR=nvim'
+    echo 'export VISUAL=nvim'
+  } >> "${HOME}/.bashrc"
 fi
 
 ############################################
@@ -274,14 +264,12 @@ fi
 echo
 echo "==> Universal installation complete!"
 echo "Neovim: nvim"
-echo "Neovim AI: :ChatGPT"
+echo "Neovim AI: :ChatGPT (requires OPENAI_API_KEY in environment)"
 echo "Terminal AI: ai \"your question\""
 if [ "$INSTALL_CODE_SERVER" = true ]; then
   echo "Code-Server: systemctl --user start code-server"
 fi
-if [ "$INSTALL_FALKON" = true ]; then
-  echo "Falkon installed: run 'falkon' to open the browser"
-fi
 echo
-
-echo "USB import script available: ./import-env-from-usb.sh"
+echo "Reminder: Use your USB import script to populate ~/.env and ensure it is sourced via /etc/bash.bashrc."
+echo "This way, your AI API Key will be installed and persistent!"
+echo "**********************  Ready for Action!!  **************************"
